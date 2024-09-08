@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="settings_icon_marginEnd">12dp</dimen>
+    <dimen name="head_paddingStart">12dp</dimen>
+    <dimen name="head_layout_height">56dp</dimen>
+    <dimen name="settings_padding_start">16dp</dimen>
+    <dimen name="main_buttons_radius">16dp</dimen>
+    <dimen name="main_buttons_margin_bottom">16dp</dimen>
+    <dimen name="zero">0dp</dimen>
+    <dimen name="icon_padding">8dp</dimen>
+    <dimen name="settings_top_padding">21dp</dimen>
+    <dimen name="settings_icon_size">24dp</dimen>
+    <dimen name="back_button">48dp</dimen>
+    <dimen name="settings_icon_margin">19dp</dimen>
+    <dimen name="settings_layouts_height">61dp</dimen>
+    <dimen name="settings_text">16sp</dimen>
+    <dimen name="main_buttons_text">22sp</dimen>
+</resources>
