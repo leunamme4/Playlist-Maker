@@ -19,8 +19,8 @@
             android:layout_height="56dp"
             android:paddingStart="12dp"
             android:paddingTop="10dp"
-            android:text="Playlist maker"
-            android:textColor="@color/white"
+            android:text="@string/app_name"
+            android:textColor="@color/white_head"
             android:textSize="22sp" />
 
         <LinearLayout
@@ -30,41 +30,58 @@
             android:padding="16dp">
 
             <Button
+                android:id="@+id/search"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginBottom="16dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="@color/white_head"
                 android:gravity="center"
-                android:text="Поиск"
+                android:text="@string/search_button"
                 android:textColor="@color/text_black"
                 android:textSize="22sp"
                 app:cornerRadius="16dp"
                 app:icon="@drawable/search"
                 app:iconGravity="textStart"
-                app:iconTint="@color/black" />
+                app:iconTint="@color/text_black"
+                app:iconPadding="8dp"
+                android:textAllCaps="false"/>
 
-            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            <Button
+                android:id="@+id/media"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginBottom="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/white_head"
                 android:gravity="center"
-                android:text="Медиатека"
+                android:text="@string/media_button"
                 android:textColor="@color/text_black"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/media_icon"
+                app:iconGravity="textStart"
+                app:iconTint="@color/text_black"
+                app:iconPadding="8dp"
+                android:textAllCaps="false"/>
 
-            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            <Button
+                android:id="@+id/settings"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginBottom="12dp"
                 android:layout_weight="1"
-                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/white_head"
                 android:gravity="center"
-                android:text="Настройки"
+                android:text="@string/settings_button"
                 android:textColor="@color/text_black"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/settings_icon"
+                app:iconGravity="textStart"
+                app:iconTint="@color/text_black"
+                app:iconPadding="8dp"/>
         </LinearLayout>
 
     </LinearLayout>
