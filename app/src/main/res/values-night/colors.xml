@@ -6,4 +6,7 @@
     <color name="blue">#1A1B22</color>
     <color name="text_black">#1A1B22</color>
     <color name="settings_text_black">#FFFFFF</color>
+    <color name="settings_icon">#FFFFFFFF</color>
+    <color name="search_edit">#FFFFFF</color>
+    <color name="search_icon">#1A1B22</color>
 </resources>
