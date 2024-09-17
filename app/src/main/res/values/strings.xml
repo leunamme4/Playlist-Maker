@@ -8,4 +8,12 @@
     <string name="support">Написать в поддержку</string>
     <string name="agreement">Пользовательское соглашение</string>
     <string name="back_desc">Назад</string>
+    <string name="search">Поиск</string>
+    <string name="practicum_url">https://practicum.yandex.ru/android-developer/?from=catalog</string>
+    <string name="support_message">"Спасибо разработчикам и разработчицам за крутое приложение!"</string>
+    <string name="support_subject">"Сообщение разработчикам и разработчицам приложения Playlist Maker"</string>
+    <string name="support_data_type">mailto:</string>
+    <string name="support_my_mail">emil.almametov@yandex.ru</string>
+    <string name="agreement_offer">https://yandex.ru/legal/practicum_offer</string>
+    <string name="sharing_type">text/plain</string>
 </resources>
