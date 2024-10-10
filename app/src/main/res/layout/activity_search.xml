@@ -41,7 +41,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp">
+            android:layout_height="52dp"
+            android:layout_marginBottom="8dp">
             <EditText
                 android:id="@+id/search_edit"
                 android:layout_width="match_parent"
@@ -75,6 +76,13 @@
                 android:visibility="gone"
                 />
         </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_tracks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

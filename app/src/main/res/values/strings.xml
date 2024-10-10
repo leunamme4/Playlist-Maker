@@ -10,10 +10,34 @@
     <string name="back_desc">Назад</string>
     <string name="search">Поиск</string>
     <string name="practicum_url">https://practicum.yandex.ru/android-developer/?from=catalog</string>
-    <string name="support_message">"Спасибо разработчикам и разработчицам за крутое приложение!"</string>
-    <string name="support_subject">"Сообщение разработчикам и разработчицам приложения Playlist Maker"</string>
+    <string name="support_message">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="support_data_type">mailto:</string>
     <string name="support_my_mail">emil.almametov@yandex.ru</string>
     <string name="agreement_offer">https://yandex.ru/legal/practicum_offer</string>
     <string name="sharing_type">text/plain</string>
+
+    <string name="mock_name1">Smells Like Teen Spirit</string>
+    <string name="mock_name2">Billie Jean</string>
+    <string name="mock_name3">Stayin\' Alive</string>
+    <string name="mock_name4">Whole Lotta Love</string>
+    <string name="mock_name5">Sweet Child O\'Mine</string>
+    <string name="mock_artist1">Nirvana</string>
+    <string name="mock_artist2">Michael Jackson</string>
+    <string name="mock_artist3">Bee Gees</string>
+    <string name="mock_artist4">Led Zeppelin</string>
+    <string name="mock_artist5">Guns N\' Roses</string>
+    <string name="mock_time1">5:01</string>
+    <string name="mock_time2">4:35</string>
+    <string name="mock_time3">4:10</string>
+    <string name="mock_time4">5:33</string>
+    <string name="mock_time5">5:03</string>
+    <string name="mock_url1">https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg</string>
+    <string name="mock_url2">https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg</string>
+    <string name="mock_url3">https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg</string>
+    <string name="mock_url4">https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg</string>
+    <string name="mock_url5">https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg</string>
+
+
+
 </resources>
