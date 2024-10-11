@@ -10,4 +10,5 @@
     <color name="search_edit">#E6E8EB</color>
     <color name="search_icon">#AEAFB4</color>
     <color name="search_text">#1A1B22</color>
+    <color name="search_error_text">#1A1B22</color>
 </resources>
