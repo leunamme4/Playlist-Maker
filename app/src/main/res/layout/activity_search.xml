@@ -65,7 +65,8 @@
                 android:textColor="@color/search_text"
                 android:textColorHint="@color/search_icon"
                 android:textFontWeight="400"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textCursorDrawable="@drawable/search_cursor"/>
 
             <ImageButton
                 android:id="@+id/clear_button"

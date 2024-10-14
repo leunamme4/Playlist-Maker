@@ -81,8 +81,7 @@ class SearchActivity : AppCompatActivity() {
             val inputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-            tracksRecyclerView.visibility = View.GONE
-            noResultsPlaceholder.visibility = View.GONE
+            updateVisibility(View.GONE, View.GONE, View.GONE)
         }
 
         // repeat the last search
@@ -107,15 +106,13 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.visibility = clearButtonVisibility(s)
                 editTextValue = s.toString()
                 if (s.isNullOrEmpty()) {
-                    tracksRecyclerView.visibility = View.GONE
-                    noResultsPlaceholder.visibility = View.GONE
+                    updateVisibility(View.GONE, View.GONE, View.GONE)
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         }
         searchEditText.addTextChangedListener(searchTextWatcher)
-
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
