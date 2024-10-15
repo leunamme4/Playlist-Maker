@@ -9,4 +9,5 @@
     <color name="settings_icon">#FFFFFFFF</color>
     <color name="search_edit">#FFFFFF</color>
     <color name="search_icon">#1A1B22</color>
+    <color name="search_error_text">#FFFFFF</color>
 </resources>

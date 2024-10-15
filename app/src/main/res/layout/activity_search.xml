@@ -43,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginBottom="8dp">
+
             <EditText
                 android:id="@+id/search_edit"
                 android:layout_width="match_parent"
@@ -56,33 +57,122 @@
                 android:drawableTint="@color/search_icon"
                 android:fontFamily="@font/ys_display_regular"
                 android:hint="@string/search"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:lines="1"
                 android:paddingHorizontal="12dp"
+                android:singleLine="true"
+                android:textColor="@color/search_text"
                 android:textColorHint="@color/search_icon"
                 android:textFontWeight="400"
                 android:textSize="16sp"
-                android:textColor="@color/search_text">
-            </EditText>
+                android:textCursorDrawable="@drawable/search_cursor"/>
+
             <ImageButton
                 android:id="@+id/clear_button"
                 android:layout_width="@dimen/search_clear_size"
                 android:layout_height="@dimen/search_clear_size"
-                android:src="@drawable/clear_button"
-                android:backgroundTint="@color/search_edit"
-                app:tint="@color/search_icon"
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="28dp"
+                android:backgroundTint="@color/search_edit"
+                android:src="@drawable/clear_button"
                 android:visibility="gone"
-                />
+                app:tint="@color/search_icon" />
         </FrameLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_tracks"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            />
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_tracks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <ScrollView
+                android:id="@+id/no_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/search_errors_margin"
+                        android:src="@drawable/noresults_placeholder" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/ys_display_medium"
+                        android:paddingHorizontal="24dp"
+                        android:text="@string/no_results"
+                        android:textAlignment="center"
+                        android:textColor="@color/search_error_text"
+                        android:textFontWeight="400"
+                        android:textSize="@dimen/search_errors_textSize" />
+                </LinearLayout>
+            </ScrollView>
+
+            <ScrollView
+                android:id="@+id/no_connection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/search_errors_margin"
+                        android:src="@drawable/noconnection_placeholder" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/ys_display_medium"
+                        android:paddingHorizontal="24dp"
+                        android:text="@string/no_connection"
+                        android:textAlignment="center"
+                        android:textColor="@color/search_error_text"
+                        android:textFontWeight="400"
+                        android:textSize="@dimen/search_errors_textSize" />
+
+                    <Button
+                        android:id="@+id/renew_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="24dp"
+                        android:backgroundTint="@color/search_error_text"
+                        android:fontFamily="@font/ys_display_medium"
+                        android:text="@string/renew_button"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textFontWeight="500"
+                        android:textSize="14sp"
+                        app:cornerRadius="54dp" />
+                </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

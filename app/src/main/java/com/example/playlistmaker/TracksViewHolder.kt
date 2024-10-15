@@ -16,8 +16,14 @@ class TracksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(track: Track) {
         artistNameView.text = track.artistName
+        artistNameView.requestLayout()
         trackNameView.text = track.trackName
-        trackTimeView.text = track.trackTime
-        Glide.with(itemView).load(track.artworkUrl100).centerCrop().placeholder(R.drawable.track_cover_placeholder).transform(RoundedCorners(itemView.context.resources.getDimensionPixelSize(R.dimen.cover_corner_radius))).into(trackImageView)
+        trackTimeView.text = track.trackTimeMillis
+        Glide.with(itemView)
+            .load(track.artworkUrl100)
+            .centerCrop()
+            .placeholder(R.drawable.track_cover_placeholder)
+            .transform(RoundedCorners(itemView.context.resources.getDimensionPixelSize(R.dimen.cover_corner_radius)))
+            .into(trackImageView)
     }
 }

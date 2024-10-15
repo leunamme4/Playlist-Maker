@@ -21,4 +21,6 @@
     <dimen name="track_name_text_size">16sp</dimen>
     <dimen name="track_info_text_size">11sp</dimen>
     <dimen name="track_view_layout">61dp</dimen>
+    <dimen name="search_errors_margin">102dp</dimen>
+    <dimen name="search_errors_textSize">19sp</dimen>
 </resources>
