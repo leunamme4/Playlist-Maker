@@ -5,12 +5,13 @@ import android.os.Parcelable
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class Track (val trackName: String, val artistName: String, var trackTimeMillis: String, val artworkUrl100: String): Parcelable {
+class Track (val trackName: String, val artistName: String, var trackTimeMillis: String, val artworkUrl100: String, val trackId: Int): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
-        parcel.readString()!!
+        parcel.readString()!!,
+        parcel.readInt()
     ) {
     }
 
@@ -19,6 +20,7 @@ class Track (val trackName: String, val artistName: String, var trackTimeMillis:
         parcel.writeString(artistName)
         parcel.writeString(trackTimeMillis)
         parcel.writeString(artworkUrl100)
+        parcel.writeInt(trackId)
     }
 
     override fun describeContents(): Int {

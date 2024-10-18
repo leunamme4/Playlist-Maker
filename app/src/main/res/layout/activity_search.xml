@@ -172,6 +172,47 @@
                         app:cornerRadius="54dp" />
                 </LinearLayout>
             </ScrollView>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="@string/search_history_text"
+                    android:textAllCaps="false"
+                    android:gravity="center"
+                    android:textSize="19sp"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textFontWeight="400"
+                    android:textColor="@color/search_error_text"
+                    android:layout_marginBottom="8dp"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/history_recycler_view"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"/>
+                <Button
+                    android:id="@+id/clear_history_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/search_error_text"
+                    app:cornerRadius = "54dp"
+                    android:text = "@string/search_clear_history"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textFontWeight="500"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+        </ScrollView>
         </FrameLayout>
     </LinearLayout>
 

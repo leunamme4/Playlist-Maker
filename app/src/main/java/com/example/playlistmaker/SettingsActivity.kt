@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlin.io.encoding.Base64
 
 class SettingsActivity : AppCompatActivity() {
@@ -16,11 +17,21 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        val sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE)
+
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.theme_switcher)
+        themeSwitcher.isChecked = sharedPreferences.getBoolean(THEME, false)
+
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            (applicationContext as App).switchTheme(checked)
+            sharedPreferences.edit()
+                .putBoolean(THEME, checked)
+                .apply()
+        }
+
         //backButton
         val backButton = findViewById<ImageButton>(R.id.back_button)
         val backClickListener: View.OnClickListener = View.OnClickListener {
-//            val navigationIntent = Intent(this@SettingsActivity, MainActivity::class.java)
-//            startActivity(navigationIntent)
             this.finish()
         }
         backButton.setOnClickListener(backClickListener)

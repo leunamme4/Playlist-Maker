@@ -39,7 +39,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val tracksApiService = retrofit.create(TracksApiService::class.java)
     private val trackList = ArrayList<Track>()
-    private val trackListAdapter = TracksAdapter(trackList)
+    private lateinit var trackListAdapter: TracksAdapter
     private lateinit var noResultsPlaceholder: ScrollView
     private lateinit var noConnectionPlaceholder: ScrollView
     private lateinit var tracksRecyclerView: RecyclerView
@@ -47,11 +47,19 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageButton
     private lateinit var backButton: ImageButton
+    private lateinit var historyRecyclerView: RecyclerView
+    private lateinit var historyLayout: LinearLayout
+    private lateinit var historyClearButton: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        val sharedPreferences = getSharedPreferences("HISTORY", MODE_PRIVATE)
+        val searchHistory = SearchHistory(sharedPreferences)
+        val historyAdapter = HistoryAdapter(searchHistory)
+        trackListAdapter = TracksAdapter(trackList, searchHistory, historyAdapter)
 
         searchEditText = findViewById(R.id.search_edit)
         clearButton = findViewById(R.id.clear_button)
@@ -60,14 +68,21 @@ class SearchActivity : AppCompatActivity() {
         noResultsPlaceholder = findViewById(R.id.no_results)
         noConnectionPlaceholder = findViewById(R.id.no_connection)
         renewButton = findViewById(R.id.renew_button)
+        historyLayout = findViewById(R.id.history)
+        historyRecyclerView = findViewById(R.id.history_recycler_view)
+        historyClearButton = findViewById(R.id.clear_history_button)
 
+        // tracks RV
         tracksRecyclerView.layoutManager = LinearLayoutManager(this)
         tracksRecyclerView.adapter = trackListAdapter
+
+        // history RV
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyRecyclerView.adapter = historyAdapter
 
         if (savedInstanceState != null) {
             searchEditText.setText(editTextValue)
         }
-
 
         //backButton
         val backClickListener: View.OnClickListener = View.OnClickListener {
@@ -75,13 +90,20 @@ class SearchActivity : AppCompatActivity() {
         }
         backButton.setOnClickListener(backClickListener)
 
-        //clear
+        // clear
         clearButton.setOnClickListener {
             searchEditText.setText("")
             val inputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             updateVisibility(View.GONE, View.GONE, View.GONE)
+        }
+
+        // clear history
+        historyClearButton.setOnClickListener {
+            searchHistory.clearHistory()
+            historyAdapter.notifyDataSetChanged()
+            historyLayout.visibility = View.GONE
         }
 
         // repeat the last search
@@ -94,9 +116,18 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 lastSearch = editTextValue
                 search(editTextValue)
+                searchEditText.clearFocus()
                 true
             }
             false
+        }
+
+        // focusListener for history
+        searchEditText.setOnFocusChangeListener{ _, hasFocus ->
+            historyLayout.visibility = if (hasFocus && searchEditText.text.isEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
+            if (historyLayout.visibility == View.VISIBLE) {
+                updateVisibility(tracksRecyclerView.visibility, View.GONE, View.GONE)
+            }
         }
 
         val searchTextWatcher = object : TextWatcher {
@@ -107,6 +138,10 @@ class SearchActivity : AppCompatActivity() {
                 editTextValue = s.toString()
                 if (s.isNullOrEmpty()) {
                     updateVisibility(View.GONE, View.GONE, View.GONE)
+                }
+                historyLayout.visibility = if (searchEditText.hasFocus() && s.isNullOrEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
+                if (historyLayout.visibility == View.VISIBLE) {
+                    updateVisibility(tracksRecyclerView.visibility, View.GONE, View.GONE)
                 }
             }
 

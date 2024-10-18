@@ -11,4 +11,8 @@
     <color name="search_icon">#AEAFB4</color>
     <color name="search_text">#1A1B22</color>
     <color name="search_error_text">#1A1B22</color>
+    <color name="switch_thumb_enable">#3772E7</color>
+    <color name="switch_track_enable">#9FBBF3</color>
+    <color name="switch_thumb_disable">#AEAFB4</color>
+    <color name="switch_track_disable">#E6E8EB</color>
 </resources>
