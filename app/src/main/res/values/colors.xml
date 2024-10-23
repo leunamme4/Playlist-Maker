@@ -15,4 +15,5 @@
     <color name="switch_track_enable">#9FBBF3</color>
     <color name="switch_thumb_disable">#AEAFB4</color>
     <color name="switch_track_disable">#E6E8EB</color>
+    <color name="player_attributes">#AEAFB4</color>
 </resources>
