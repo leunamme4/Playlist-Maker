@@ -27,6 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Query
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.log
 
 class SearchActivity : AppCompatActivity() {
     var editTextValue = TEXT_DEFAULT
@@ -40,6 +41,7 @@ class SearchActivity : AppCompatActivity() {
     private val tracksApiService = retrofit.create(TracksApiService::class.java)
     private val trackList = ArrayList<Track>()
     private lateinit var trackListAdapter: TracksAdapter
+    private lateinit var historyAdapter: HistoryAdapter
     private lateinit var noResultsPlaceholder: ScrollView
     private lateinit var noConnectionPlaceholder: ScrollView
     private lateinit var tracksRecyclerView: RecyclerView
@@ -50,6 +52,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var historyLayout: LinearLayout
     private lateinit var historyClearButton: Button
+    private lateinit var searchHistory: SearchHistory
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,9 +60,21 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         val sharedPreferences = getSharedPreferences("HISTORY", MODE_PRIVATE)
-        val searchHistory = SearchHistory(sharedPreferences)
-        val historyAdapter = HistoryAdapter(searchHistory)
-        trackListAdapter = TracksAdapter(trackList, searchHistory, historyAdapter)
+        searchHistory = SearchHistory(sharedPreferences)
+        historyAdapter = HistoryAdapter(searchHistory.historyArrayList) { track ->
+            searchHistory.updateHistory(track)
+            historyAdapter.notifyDataSetChanged()
+            val navigationIntent = Intent(this@SearchActivity, PlayerActivity()::class.java)
+            navigationIntent.putExtra("track", track)
+            startActivity(navigationIntent)
+        }
+        trackListAdapter = TracksAdapter(trackList) { track ->
+            searchHistory.updateHistory(track)
+            historyAdapter.notifyDataSetChanged()
+            val navigationIntent = Intent(this@SearchActivity, PlayerActivity()::class.java)
+            navigationIntent.putExtra("track", track)
+            startActivity(navigationIntent)
+        }
 
         searchEditText = findViewById(R.id.search_edit)
         clearButton = findViewById(R.id.clear_button)
@@ -123,8 +138,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         // focusListener for history
-        searchEditText.setOnFocusChangeListener{ _, hasFocus ->
-            historyLayout.visibility = if (hasFocus && searchEditText.text.isEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            historyLayout.visibility =
+                if (hasFocus && searchEditText.text.isEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
             if (historyLayout.visibility == View.VISIBLE) {
                 updateVisibility(tracksRecyclerView.visibility, View.GONE, View.GONE)
             }
@@ -139,7 +155,8 @@ class SearchActivity : AppCompatActivity() {
                 if (s.isNullOrEmpty()) {
                     updateVisibility(View.GONE, View.GONE, View.GONE)
                 }
-                historyLayout.visibility = if (searchEditText.hasFocus() && s.isNullOrEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
+                historyLayout.visibility =
+                    if (searchEditText.hasFocus() && s.isNullOrEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
                 if (historyLayout.visibility == View.VISIBLE) {
                     updateVisibility(tracksRecyclerView.visibility, View.GONE, View.GONE)
                 }
@@ -228,6 +245,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<TrackList>, t: Throwable) {
+                Log.d("mymy", "lollololo")
                 trackList.clear()
                 trackListAdapter.notifyDataSetChanged()
                 if (noResultsPlaceholder.visibility == LinearLayout.VISIBLE) {

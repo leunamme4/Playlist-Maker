@@ -5,15 +5,31 @@ import android.os.Parcelable
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class Track (val trackName: String, val artistName: String, var trackTimeMillis: String, val artworkUrl100: String, val trackId: Int): Parcelable {
+class Track(
+    val trackName: String,
+    val artistName: String,
+    var trackTimeMillis: String,
+    val artworkUrl100: String,
+    val trackId: Int,
+    var collectionName: String,
+    val releaseDate: String,
+    val primaryGenreName: String,
+    val country: String
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
-        parcel.readInt()
-    ) {
-    }
+        parcel.readInt(),
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!
+    )
+
+    fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+    fun getYear() = releaseDate.takeWhile { it != '-' }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(trackName)
@@ -21,6 +37,10 @@ class Track (val trackName: String, val artistName: String, var trackTimeMillis:
         parcel.writeString(trackTimeMillis)
         parcel.writeString(artworkUrl100)
         parcel.writeInt(trackId)
+        parcel.writeString(collectionName)
+        parcel.writeString(releaseDate)
+        parcel.writeString(primaryGenreName)
+        parcel.writeString(country)
     }
 
     override fun describeContents(): Int {
