@@ -6,6 +6,8 @@ import android.net.Uri
 import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -16,6 +18,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.ScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +35,8 @@ import kotlin.math.log
 class SearchActivity : AppCompatActivity() {
     var editTextValue = TEXT_DEFAULT
     private var lastSearch = ""
+    val handler = Handler(Looper.getMainLooper())
+    private var isClickAllowed = true
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com/")
@@ -53,27 +58,32 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyLayout: LinearLayout
     private lateinit var historyClearButton: Button
     private lateinit var searchHistory: SearchHistory
+    private lateinit var progressBar: ProgressBar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val sharedPreferences = getSharedPreferences("HISTORY", MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(HISTORY_PREFERENCES, MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPreferences)
         historyAdapter = HistoryAdapter(searchHistory.historyArrayList) { track ->
-            searchHistory.updateHistory(track)
-            historyAdapter.notifyDataSetChanged()
-            val navigationIntent = Intent(this@SearchActivity, PlayerActivity()::class.java)
-            navigationIntent.putExtra("track", track)
-            startActivity(navigationIntent)
+            if (clickDebounce()) {
+                searchHistory.updateHistory(track)
+                historyAdapter.notifyDataSetChanged()
+                val navigationIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                navigationIntent.putExtra(TRACK_INTENT, track)
+                startActivity(navigationIntent)
+            }
         }
         trackListAdapter = TracksAdapter(trackList) { track ->
-            searchHistory.updateHistory(track)
-            historyAdapter.notifyDataSetChanged()
-            val navigationIntent = Intent(this@SearchActivity, PlayerActivity()::class.java)
-            navigationIntent.putExtra("track", track)
-            startActivity(navigationIntent)
+            if (clickDebounce()) {
+                searchHistory.updateHistory(track)
+                historyAdapter.notifyDataSetChanged()
+                val navigationIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                navigationIntent.putExtra(TRACK_INTENT, track)
+                startActivity(navigationIntent)
+            }
         }
 
         searchEditText = findViewById(R.id.search_edit)
@@ -86,6 +96,7 @@ class SearchActivity : AppCompatActivity() {
         historyLayout = findViewById(R.id.history)
         historyRecyclerView = findViewById(R.id.history_recycler_view)
         historyClearButton = findViewById(R.id.clear_history_button)
+        progressBar = findViewById(R.id.progressBar)
 
         // tracks RV
         tracksRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -123,18 +134,9 @@ class SearchActivity : AppCompatActivity() {
 
         // repeat the last search
         renewButton.setOnClickListener {
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             search(lastSearch)
-        }
-
-        // search by ACTION.DONE click
-        searchEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                lastSearch = editTextValue
-                search(editTextValue)
-                searchEditText.clearFocus()
-                true
-            }
-            false
         }
 
         // focusListener for history
@@ -150,15 +152,18 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                handler.removeCallbacks(searchRunnable)
                 clearButton.visibility = clearButtonVisibility(s)
                 editTextValue = s.toString()
-                if (s.isNullOrEmpty()) {
-                    updateVisibility(View.GONE, View.GONE, View.GONE)
-                }
                 historyLayout.visibility =
                     if (searchEditText.hasFocus() && s.isNullOrEmpty() && searchHistory.historyArrayList.isNotEmpty()) View.VISIBLE else View.GONE
                 if (historyLayout.visibility == View.VISIBLE) {
                     updateVisibility(tracksRecyclerView.visibility, View.GONE, View.GONE)
+                }
+                if (s.isNullOrEmpty()) {
+                    updateVisibility(View.GONE, View.GONE, View.GONE)
+                } else {
+                    handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
                 }
             }
 
@@ -211,7 +216,22 @@ class SearchActivity : AppCompatActivity() {
         noResultsPlaceholder.visibility = noResultsVisibility
     }
 
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     private fun search(text: String) {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+        // сбрасываем видимость и отображаем загрузку
+        updateVisibility(View.GONE, View.GONE, View.GONE)
+        progressBar.visibility = View.VISIBLE
+
         tracksApiService.search(text).enqueue(object : Callback<TrackList> {
             override fun onResponse(
                 call: Call<TrackList>,
@@ -242,23 +262,32 @@ class SearchActivity : AppCompatActivity() {
                 } else {
                     updateVisibility(View.GONE, View.VISIBLE, View.GONE)
                 }
+                progressBar.visibility = View.GONE
             }
 
             override fun onFailure(call: Call<TrackList>, t: Throwable) {
-                Log.d("mymy", "lollololo")
                 trackList.clear()
                 trackListAdapter.notifyDataSetChanged()
-                if (noResultsPlaceholder.visibility == LinearLayout.VISIBLE) {
-                    noResultsPlaceholder.visibility = LinearLayout.GONE
+                if (noResultsPlaceholder.visibility == View.VISIBLE) {
+                    noResultsPlaceholder.visibility = View.GONE
                 }
-                noConnectionPlaceholder.visibility = LinearLayout.VISIBLE
+                noConnectionPlaceholder.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
         })
     }
 
     companion object {
-        val SEARCH_TEXT = "SEARCH_TEXT"
-        val TEXT_DEFAULT = ""
+        const val SEARCH_TEXT = "SEARCH_TEXT"
+        const val TEXT_DEFAULT = ""
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
+
+    val searchRunnable = Runnable {
+        lastSearch = editTextValue
+        search(editTextValue)
+        searchEditText.clearFocus()
     }
 
 }
