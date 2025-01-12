@@ -1,19 +1,19 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.player
 
-import android.graphics.drawable.Drawable
-import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.Creator.getPlayerInteractor
+import com.example.playlistmaker.R
+import com.example.playlistmaker.TRACK_INTENT
+import com.example.playlistmaker.domain.api.PlayerInteractor
+import com.example.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -31,12 +31,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var albumGroup: Group
     private lateinit var playButton: ImageButton
     private lateinit var actualTime: TextView
-    private var playTimeRunnable: Runnable = Runnable{}
 
-    private val mediaPlayer = MediaPlayer()
-    private var playerState = STATE_DEFAULT
-
-    private val handler = Handler(Looper.getMainLooper())
+    private val playerInteractor = getPlayerInteractor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +73,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        releasePlayer()
     }
 
     private fun trackInflate() {
@@ -98,61 +94,45 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun preparePlayer(track: Track) {
-        mediaPlayer.setDataSource(track.previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            //playButton.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            //play.text = "PLAY"
-            handler.removeCallbacks(playTimeRunnable)
-            actualTime.text = getString(R.string.track_play_start)
-            loadPlayButton(R.drawable.play)
-            playerState = STATE_PREPARED
-        }
-    }
-
-    private fun startPlayer() {
-        mediaPlayer.start()
-        loadPlayButton(R.drawable.pause)
-        playTimeTask()
-        handler.post(playTimeRunnable)
-        playerState = STATE_PLAYING
+        playerInteractor.preparePlayer(
+            track,
+            callbackPrepare = object : PlayerInteractor.PlayerConsumerPrepare {
+                override fun consumePrepare() {
+                    actualTime.text = getString(R.string.track_play_start)
+                    loadPlayButton(R.drawable.play)
+                }
+            },
+        )
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
-        loadPlayButton(R.drawable.play)
-        handler.removeCallbacks(playTimeRunnable)
-        playerState = STATE_PAUSED
+        playerInteractor.pausePlayer(callbackPause = object : PlayerInteractor.PlayerPause {
+            override fun consumePause() {
+                loadPlayButton(R.drawable.play)
+            }
+        })
     }
 
     private fun playControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
+        playerInteractor.playControl(
+            callback = object : PlayerInteractor.PlayerConsumer {
+                override fun consumeStart() {
+                    loadPlayButton(R.drawable.pause)
+                }
 
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
+                override fun consumePause() {
+                    loadPlayButton(R.drawable.play)
+                }
+
+                override fun consumeControl() {
+                    actualTime.text = getActualTime()
+                }
             }
-        }
+        )
     }
 
-    private fun playTimeTask() {
-        playTimeRunnable = object : Runnable {
-            override fun run() {
-                Log.d("my", "runnin")
-                //timePassed = System.currentTimeMillis() - startTime
-                actualTime.text = SimpleDateFormat(
-                    "mm:ss",
-                    Locale.getDefault()
-                ).format(mediaPlayer.currentPosition)
-
-                handler.postDelayed(this, DELAY_CHECK_TIME)
-            }
-        }
+    private fun releasePlayer() {
+        playerInteractor.releasePlayer()
     }
 
     private fun loadPlayButton(resourceId: Int) {
@@ -161,15 +141,7 @@ class PlayerActivity : AppCompatActivity() {
             .into(playButton)
     }
 
-
-    // состояния воспроизведения
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-
-        private const val DELAY_CHECK_TIME = 30L
+    private fun getActualTime() : CharSequence {
+        return playerInteractor.getActualTime()
     }
-
 }
