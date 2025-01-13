@@ -28,7 +28,6 @@ class TracksInteractorImpl(private val tracksRepository: TracksRepository, priva
     }
 
     override fun getHistory(): List<Track> {
-        //consumer.consume()
         return tracksRepository.getHistory()
     }
 

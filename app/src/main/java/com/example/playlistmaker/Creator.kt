@@ -1,7 +1,6 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import com.example.playlistmaker.data.Player
@@ -17,7 +16,7 @@ import com.example.playlistmaker.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.domain.api.PlayerInteractor
 import com.example.playlistmaker.domain.api.PlayerRepository
 import com.example.playlistmaker.domain.api.SearchUtilsInteractor
-import com.example.playlistmaker.domain.api.SearchUtilsInteractorImpl
+import com.example.playlistmaker.domain.impl.SearchUtilsInteractorImpl
 import com.example.playlistmaker.domain.api.SearchUtilsRepository
 import com.example.playlistmaker.domain.api.ThemeInteractor
 import com.example.playlistmaker.domain.api.ThemeRepository

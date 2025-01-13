@@ -1,4 +1,3 @@
 package com.example.playlistmaker.data.dto
 
-class TracksSearchResponse (val results: List<TrackDto>) : Response() {
-}
+class TracksSearchResponse (val results: List<TrackDto>) : Response()

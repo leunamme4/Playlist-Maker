@@ -79,16 +79,4 @@ class TracksRepositoryImpl(
             )
         }
     }
-
-//    override fun getTracks(): ArrayList<Track> {
-//        return trackList.tracks
-//    }
-//
-//    override fun addAllTracks(tracks: List<Track>) {
-//        trackList.addAllTracks(tracks)
-//    }
-//
-//    override fun clearTracks() {
-//        trackList.clearTracks()
-//    }
 }

@@ -21,7 +21,7 @@ class ThemeControl {
     }
 
     fun themeInit() {
-        darkTheme = sharedPreferences.getBoolean(THEME, true)
+        darkTheme = sharedPreferences.getBoolean(THEME, false)
         switchTheme(darkTheme)
     }
 

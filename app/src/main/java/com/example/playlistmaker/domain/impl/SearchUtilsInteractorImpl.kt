@@ -1,6 +1,10 @@
-package com.example.playlistmaker.domain.api
+package com.example.playlistmaker.domain.impl
 
-class SearchUtilsInteractorImpl(private val searchUtilsRepository: SearchUtilsRepository): SearchUtilsInteractor {
+import com.example.playlistmaker.domain.api.SearchUtilsInteractor
+import com.example.playlistmaker.domain.api.SearchUtilsRepository
+
+class SearchUtilsInteractorImpl(private val searchUtilsRepository: SearchUtilsRepository):
+    SearchUtilsInteractor {
     override fun clickDebounce(): Boolean {
         return searchUtilsRepository.clickDebounce()
     }

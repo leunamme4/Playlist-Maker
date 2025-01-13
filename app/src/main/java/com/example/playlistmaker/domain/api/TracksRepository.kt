@@ -10,10 +10,4 @@ interface TracksRepository {
     fun clearHistory()
 
     fun getHistory() : List<Track>
-
-//    fun getTracks() : ArrayList<Track>
-//
-//    fun addAllTracks(tracks: List<Track>)
-//
-//    fun clearTracks()
 }
