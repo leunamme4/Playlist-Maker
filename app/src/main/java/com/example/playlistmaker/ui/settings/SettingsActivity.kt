@@ -1,32 +1,29 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.settings
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.os.IResultReceiver2.Default
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import com.example.playlistmaker.Creator.getThemeInteractor
+import com.example.playlistmaker.R
 import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlin.io.encoding.Base64
 
 class SettingsActivity : AppCompatActivity() {
+
+    private val themeInteractor = getThemeInteractor()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE)
-
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.theme_switcher)
-        themeSwitcher.isChecked = sharedPreferences.getBoolean(THEME, false)
+        themeSwitcher.isChecked = getDarkTheme()
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            (applicationContext as App).switchTheme(checked)
-            sharedPreferences.edit()
-                .putBoolean(THEME, checked)
-                .apply()
+            onThemeChanged(checked)
         }
 
         //backButton
@@ -70,5 +67,13 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(agreementIntent)
         }
         agreementButton.setOnClickListener(agreementClickListener)
+    }
+
+    private fun getDarkTheme() : Boolean {
+        return themeInteractor.getDarkTheme()
+    }
+
+    private fun onThemeChanged(checked: Boolean) {
+        themeInteractor.onThemeChange(checked)
     }
 }
