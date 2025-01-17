@@ -1,19 +1,18 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Group
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.creator.Creator.getPlayerInteractor
 import com.example.playlistmaker.R
-import com.example.playlistmaker.TRACK_INTENT
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.search.domain.models.Track
 
 class PlayerActivity : AppCompatActivity() {
@@ -33,14 +32,20 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
 
-    private val playerInteractor = getPlayerInteractor()
+    private lateinit var viewModel: PlayerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        track = intent.getParcelableExtra(TRACK_INTENT)!!
+        viewModel = ViewModelProvider(
+            this,
+            PlayerViewModel.getViewModelFactory()
+        )[PlayerViewModel::class.java]
+
+        track = viewModel.getTrack()
+
         backButton = binding.backButtonPlayer
         nameData = binding.name
         artistData = binding.artist
@@ -62,20 +67,44 @@ class PlayerActivity : AppCompatActivity() {
 
         trackInflate()
 
-        preparePlayer(track)
+        viewModel.getPlayerScreenState().observe(this) { screenState ->
+            when (screenState) {
+                is PlayerState.Paused -> {
+                    loadPlayButton(R.drawable.play)
+                    actualTime.text = screenState.time
+                }
+
+                is PlayerState.Playing -> {
+                    loadPlayButton(R.drawable.pause)
+                    actualTime.text = screenState.time
+                }
+
+                is PlayerState.Prepared -> {
+                    actualTime.text = getString(R.string.track_play_start)
+                    loadPlayButton(R.drawable.play)
+                }
+
+                is PlayerState.Created -> {
+                    viewModel.preparePlayer()
+                }
+
+                else -> {}
+            }
+        }
+
         playButton.setOnClickListener {
-            playControl()
+            viewModel.playControl()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        viewModel.pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        releasePlayer()
+        if (isFinishing) viewModel.releasePlayer()
     }
 
     private fun trackInflate() {
@@ -95,55 +124,9 @@ class PlayerActivity : AppCompatActivity() {
             .into(cover)
     }
 
-    private fun preparePlayer(track: Track) {
-        playerInteractor.preparePlayer(
-            track,
-            callbackPrepare = object : PlayerInteractor.PlayerConsumerPrepare {
-                override fun consumePrepare() {
-                    actualTime.text = getString(R.string.track_play_start)
-                    loadPlayButton(R.drawable.play)
-                }
-            },
-        )
-    }
-
-    private fun pausePlayer() {
-        playerInteractor.pausePlayer(callbackPause = object : PlayerInteractor.PlayerPause {
-            override fun consumePause() {
-                loadPlayButton(R.drawable.play)
-            }
-        })
-    }
-
-    private fun playControl() {
-        playerInteractor.playControl(
-            callback = object : PlayerInteractor.PlayerConsumer {
-                override fun consumeStart() {
-                    loadPlayButton(R.drawable.pause)
-                }
-
-                override fun consumePause() {
-                    loadPlayButton(R.drawable.play)
-                }
-
-                override fun consumeControl() {
-                    actualTime.text = getActualTime()
-                }
-            }
-        )
-    }
-
-    private fun releasePlayer() {
-        playerInteractor.releasePlayer()
-    }
-
     private fun loadPlayButton(resourceId: Int) {
         Glide.with(playButton)
             .load(resourceId)
             .into(playButton)
-    }
-
-    private fun getActualTime() : CharSequence {
-        return playerInteractor.getActualTime()
     }
 }

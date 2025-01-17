@@ -25,9 +25,19 @@ import com.example.playlistmaker.settings.domain.api.ThemeRepository
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.player.domain.impl.PlayerInteractorImpl
+import com.example.playlistmaker.search.data.TracksIntentRepositoryImpl
+import com.example.playlistmaker.search.data.dto.TracksIntent
+import com.example.playlistmaker.search.domain.api.TracksIntentInteractor
+import com.example.playlistmaker.search.domain.api.TracksIntentRepository
+import com.example.playlistmaker.search.domain.impl.TracksIntentInteractorImpl
 import com.example.playlistmaker.settings.domain.impl.ThemeInteractorImpl
 import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.sharing.data.ExternalNavigator
+import com.example.playlistmaker.sharing.data.NavigationRepositoryImpl
+import com.example.playlistmaker.sharing.domain.api.NavigationInteractor
+import com.example.playlistmaker.sharing.domain.api.NavigationRepository
+import com.example.playlistmaker.sharing.domain.impl.NavigationInteractorImpl
 import java.util.ArrayList
 
 object Creator {
@@ -43,6 +53,14 @@ object Creator {
 
     fun getTracksInteractor(): TracksInteractor {
         return TracksInteractorImpl(getTracksRepository(), TrackList(ArrayList<Track>()))
+    }
+
+    private fun getTracksIntentRepository(): TracksIntentRepository {
+        return TracksIntentRepositoryImpl(TracksIntent())
+    }
+
+    fun getTracksIntentInteractor(): TracksIntentInteractor {
+        return TracksIntentInteractorImpl(getTracksIntentRepository())
     }
 
     fun provideSharedPreferences() : SharedPreferences {
@@ -75,5 +93,13 @@ object Creator {
 
     private fun getSearchUtilsRepository() : SearchUtilsRepository {
         return SearchUtilsRepositoryImpl(SearchUtils())
+    }
+
+    fun getNavigationInteractor() : NavigationInteractor {
+        return NavigationInteractorImpl(getNavigationRepository())
+    }
+
+    private fun getNavigationRepository() : NavigationRepository {
+        return NavigationRepositoryImpl(ExternalNavigator(application.applicationContext))
     }
 }

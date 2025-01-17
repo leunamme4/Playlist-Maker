@@ -18,9 +18,8 @@ class TracksInteractorImpl(private val tracksRepository: TracksRepository, priva
         }
     }
 
-    override fun updateHistory(track: Track, consumer: TracksInteractor.TracksHistoryConsumer) {
+    override fun updateHistory(track: Track) {
         tracksRepository.updateHistory(track)
-        consumer.consume()
     }
 
     override fun clearHistory(consumer: TracksInteractor.TracksHistoryConsumer) {

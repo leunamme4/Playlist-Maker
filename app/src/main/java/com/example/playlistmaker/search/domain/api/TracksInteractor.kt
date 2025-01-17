@@ -6,7 +6,7 @@ interface TracksInteractor {
 
     fun searchTracks(expression: String, consumer: TracksConsumer)
 
-    fun updateHistory(track: Track, consumer: TracksHistoryConsumer)
+    fun updateHistory(track: Track)
 
     fun clearHistory(consumer: TracksHistoryConsumer)
 
