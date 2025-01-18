@@ -1,7 +1,6 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -16,7 +15,6 @@ import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.search.domain.models.Track
 
 class PlayerActivity : AppCompatActivity() {
-    private lateinit var track: Track
     private lateinit var backButton: ImageButton
     private lateinit var nameData: TextView
     private lateinit var artistData: TextView
@@ -44,8 +42,6 @@ class PlayerActivity : AppCompatActivity() {
             PlayerViewModel.getViewModelFactory()
         )[PlayerViewModel::class.java]
 
-        track = viewModel.getTrack()
-
         backButton = binding.backButtonPlayer
         nameData = binding.name
         artistData = binding.artist
@@ -65,7 +61,9 @@ class PlayerActivity : AppCompatActivity() {
         }
         backButton.setOnClickListener(backClickListener)
 
-        trackInflate()
+        viewModel.observeTrack().observe(this) {
+            trackInflate(it)
+        }
 
         viewModel.getPlayerScreenState().observe(this) { screenState ->
             when (screenState) {
@@ -107,7 +105,7 @@ class PlayerActivity : AppCompatActivity() {
         if (isFinishing) viewModel.releasePlayer()
     }
 
-    private fun trackInflate() {
+    private fun trackInflate(track: Track) {
         nameData.text = track.trackName
         artistData.text = track.artistName
         timeData.text = track.trackTimeMillis

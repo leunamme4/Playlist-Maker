@@ -1,22 +1,24 @@
 package com.example.playlistmaker.player.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.search.domain.api.TracksIntentInteractor
 import com.example.playlistmaker.search.domain.models.Track
 
-class PlayerViewModel(private val playerInteractor: PlayerInteractor, private val tracksIntentInteractor: TracksIntentInteractor) : ViewModel() {
+class PlayerViewModel(
+    private val playerInteractor: PlayerInteractor,
+    private val tracksIntentInteractor: TracksIntentInteractor
+) : ViewModel() {
 
-    private val track = tracksIntentInteractor.getPlayerTrack()
+    private var track = MutableLiveData<Track>(tracksIntentInteractor.getPlayerTrack())
+
+    fun observeTrack(): LiveData<Track> = track
 
     private var playerScreenState = MutableLiveData<PlayerState>(PlayerState.Created)
     fun getPlayerScreenState(): LiveData<PlayerState> = playerScreenState
@@ -24,8 +26,8 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor, private va
 
     fun preparePlayer() {
         playerInteractor.preparePlayer(
-            track,
-            callbackPrepare = object :  PlayerInteractor. PlayerConsumerPrepare {
+            track.value!!,
+            callbackPrepare = object : PlayerInteractor.PlayerConsumerPrepare {
                 override fun consumePrepare() {
                     playerScreenState.value = PlayerState.Prepared
                 }
@@ -51,7 +53,7 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor, private va
         )
     }
 
-   fun pausePlayer() {
+    fun pausePlayer() {
         playerInteractor.pausePlayer(callbackPause = object : PlayerInteractor.PlayerPause {
             override fun consumePause() {
                 playerScreenState.value = PlayerState.Paused(getActualTime())
@@ -67,16 +69,8 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor, private va
         return playerInteractor.getActualTime()
     }
 
-    fun getTrack(): Track {
-        return track
-    }
-
-    fun setState(playerState: PlayerState) {
-        playerScreenState.value = playerState
-    }
-
     companion object {
-        fun getViewModelFactory() : ViewModelProvider.Factory = viewModelFactory{
+        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val playerInteractor = Creator.getPlayerInteractor()
                 val tracksIntentInteractor = Creator.getTracksIntentInteractor()

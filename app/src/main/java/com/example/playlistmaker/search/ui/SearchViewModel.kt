@@ -20,10 +20,14 @@ class SearchViewModel(
     private val tracksIntentInteractor: TracksIntentInteractor
 ) : ViewModel() {
 
+
     val handler = Handler(Looper.getMainLooper())
 
-    var tracks = getTrackList()
-    var history = getTracksHistory()
+    private var tracks = MutableLiveData<List<Track>>(getTrackList())
+    fun observeTracks(): LiveData<List<Track>> = tracks
+
+    private var history = MutableLiveData<List<Track>>(getTracksHistory())
+    fun observeHistory(): LiveData<List<Track>> = history
 
     // state
     private var searchState = MutableLiveData<SearchState>()
@@ -37,7 +41,7 @@ class SearchViewModel(
         searchUtilsInteractor.setEditTextValue(text)
     }
 
-    fun getLastSearch(): String {
+    private fun getLastSearch(): String {
         return searchUtilsInteractor.getLastSearch()
     }
 
@@ -45,16 +49,13 @@ class SearchViewModel(
         searchUtilsInteractor.setLastSearch(text)
     }
 
-    fun getEditTextValue(): String {
-        return searchUtilsInteractor.getEditTextValue()
-    }
-
     fun search(text: String) {
+        val searchText = if (text == "") getLastSearch() else text
         setState(SearchState.Loading)
-        setLastSearch(text)
+        setLastSearch(searchText)
         tracksInteractor.clearTracks()
 
-        tracksInteractor.searchTracks(text, object : TracksInteractor.TracksConsumer {
+        tracksInteractor.searchTracks(searchText, object : TracksInteractor.TracksConsumer {
             override fun consume(foundTracks: List<Track>, status: Boolean) {
                 tracksInteractor.clearTracks()
                 if (!status) {
@@ -80,7 +81,7 @@ class SearchViewModel(
     fun clearHistory() {
         tracksInteractor.clearHistory(object : TracksInteractor.TracksHistoryConsumer {
             override fun consume() {
-                history = getTracksHistory()
+                history.value = getTracksHistory()
                 setState(SearchState.Default)
             }
         }
@@ -94,7 +95,7 @@ class SearchViewModel(
     fun updateHistory(track: Track) {
         if (clickDebounce()) {
             tracksInteractor.updateHistory(track)
-            history = getTracksHistory()
+            history.value = getTracksHistory()
         }
     }
 

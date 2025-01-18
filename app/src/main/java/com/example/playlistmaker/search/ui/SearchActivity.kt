@@ -14,6 +14,8 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,15 +53,13 @@ class SearchActivity : AppCompatActivity() {
             SearchViewModel.getViewModelFactory()
         )[SearchViewModel::class.java]
 
-        historyAdapter = HistoryAdapter(getHistory()) { track ->
+        historyAdapter = HistoryAdapter(emptyList()) { track ->
             viewModel.updateHistory(track)
-            historyAdapterUpgrade()
             trackIntent(track)
         }
 
-        trackListAdapter = TracksAdapter(getTrackList()) { track ->
+        trackListAdapter = TracksAdapter(emptyList()) { track ->
             viewModel.updateHistory(track)
-            historyAdapterUpgrade()
             trackIntent(track)
         }
 
@@ -74,6 +74,8 @@ class SearchActivity : AppCompatActivity() {
         historyRecyclerView = binding.historyRecyclerView
         historyClearButton = binding.clearHistoryButton
         progressBar = binding.progressBar
+        var historySize = 0
+        var newLastValue = TEXT_DEFAULT
 
         // tracks RV
         tracksRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -83,34 +85,78 @@ class SearchActivity : AppCompatActivity() {
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         historyRecyclerView.adapter = historyAdapter
 
+        viewModel.observeTracks().observe(this) {
+            trackListAdapter.tracks = it
+        }
+
+        viewModel.observeHistory().observe(this) {
+            historySize = it.size
+            historyAdapter.tracks = it
+            historyAdapter.notifyDataSetChanged()
+        }
 
         viewModel.getSearchState().observe(this) { screenState ->
             when (screenState) {
                 is SearchState.Default -> {
-                    renderScreenState(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
+                    renderScreenState(
+                        tracksVisibility = View.GONE,
+                        historyVisibility = View.GONE,
+                        noConnectionVisibility = View.GONE,
+                        noResultsVisibility = View.GONE,
+                        progressBarVisibility = View.GONE
+                    )
                 }
 
                 is SearchState.Loading -> {
                     hideKeyboard()
-                    renderScreenState(View.GONE, View.GONE, View.GONE, View.GONE, View.VISIBLE)
+                    renderScreenState(
+                        tracksVisibility = View.GONE,
+                        historyVisibility = View.GONE,
+                        noConnectionVisibility = View.GONE,
+                        noResultsVisibility = View.GONE,
+                        progressBarVisibility = View.VISIBLE
+                    )
                 }
 
                 is SearchState.Content -> {
                     trackListAdapter.notifyDataSetChanged()
-                    renderScreenState(View.VISIBLE, View.GONE, View.GONE, View.GONE, View.GONE)
+                    renderScreenState(
+                        tracksVisibility = View.VISIBLE,
+                        historyVisibility = View.GONE,
+                        noConnectionVisibility = View.GONE,
+                        noResultsVisibility = View.GONE,
+                        progressBarVisibility = View.GONE
+                    )
                 }
 
                 is SearchState.Empty -> {
-                    renderScreenState(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                    renderScreenState(
+                        tracksVisibility = View.GONE,
+                        historyVisibility = View.GONE,
+                        noConnectionVisibility = View.GONE,
+                        noResultsVisibility = View.VISIBLE,
+                        progressBarVisibility = View.GONE
+                    )
                 }
 
                 is SearchState.NoConnection -> {
-                    renderScreenState(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                    renderScreenState(
+                        tracksVisibility = View.GONE,
+                        historyVisibility = View.GONE,
+                        noConnectionVisibility = View.VISIBLE,
+                        noResultsVisibility = View.GONE,
+                        progressBarVisibility = View.GONE
+                    )
                 }
 
                 is SearchState.History -> {
-                    historyAdapterUpgrade()
-                    renderScreenState(View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                    renderScreenState(
+                        tracksVisibility = View.GONE,
+                        historyVisibility = View.VISIBLE,
+                        noConnectionVisibility = View.GONE,
+                        noResultsVisibility = View.GONE,
+                        progressBarVisibility = View.GONE
+                    )
                 }
             }
 
@@ -125,22 +171,19 @@ class SearchActivity : AppCompatActivity() {
         // clear history
         historyClearButton.setOnClickListener {
             viewModel.clearHistory()
-            historyAdapterUpgrade()
             viewModel.setState(SearchState.Default)
         }
 
         // repeat the last search
         renewButton.setOnClickListener {
             hideKeyboard()
-            viewModel.search(viewModel.getLastSearch())
+            viewModel.search(TEXT_DEFAULT)
         }
 
         // focusListener for history
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            historyLayout.visibility =
-                if (hasFocus && searchEditText.text.isEmpty() && getHistory()
-                        .isNotEmpty()
-                ) View.VISIBLE else View.GONE
+            historyLayout.isVisible =
+                hasFocus && searchEditText.text.isEmpty() && historySize > 0
         }
 
         val searchTextWatcher = object : TextWatcher {
@@ -148,11 +191,11 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.removeCallbacks()
-                clearButton.visibility = clearButtonVisibility(s)
-                val lastValue = getEditTextValue()
-                setEditTextValue(s.toString()) // 1
-                if (searchEditText.hasFocus() && s.isNullOrEmpty() && getHistory()
-                        .isNotEmpty()
+                clearButton.isGone = s.isNullOrEmpty()
+                val lastValue = newLastValue
+                newLastValue = s.toString()
+                setEditTextValue(newLastValue)
+                if (searchEditText.hasFocus() && s.isNullOrEmpty() && historySize > 0
                 ) viewModel.setState(SearchState.History) else historyLayout.visibility =
                     View.GONE
                 if (searchEditText.text.toString() != lastValue && !s.isNullOrEmpty()) {
@@ -165,26 +208,10 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.addTextChangedListener(searchTextWatcher)
     }
 
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-    }
-
     private fun hideKeyboard() {
         val inputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-    }
-
-    private fun getHistory(): List<Track> {
-        return viewModel.history
-    }
-
-    private fun getTrackList(): ArrayList<Track> {
-        return viewModel.tracks
     }
 
     private fun trackIntent(track: Track) {
@@ -206,10 +233,6 @@ class SearchActivity : AppCompatActivity() {
         viewModel.setEditTextValue(text)
     }
 
-    fun getEditTextValue(): String {
-        return viewModel.getEditTextValue()
-    }
-
     private fun renderScreenState(
         tracksVisibility: Int,
         historyVisibility: Int,
@@ -224,12 +247,7 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = progressBarVisibility
     }
 
-    private fun historyAdapterUpgrade() {
-        historyAdapter.tracks = getHistory()
-        historyAdapter.notifyDataSetChanged()
-    }
-
-    companion object {
+    private companion object {
         const val TEXT_DEFAULT = ""
     }
 }

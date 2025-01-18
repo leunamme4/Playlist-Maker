@@ -3,13 +3,13 @@ package com.example.playlistmaker.settings.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.playlistmaker.creator.Creator.getThemeInteractor
-import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.settings.data.CheckedState
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -17,13 +17,20 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("theme", "theme")
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, SettingsViewModel.getViewModelFactory())[SettingsViewModel::class.java]
+        viewModel.initChecked()
 
         val themeSwitcher = binding.themeSwitcher
-        themeSwitcher.isChecked = viewModel.getDarkTheme()
+        viewModel.observeDarkTheme().observe(this) {
+            if (it !is CheckedState.None) {
+                themeSwitcher.isChecked = it is CheckedState.Checked
+                viewModel.setState(CheckedState.None)
+            }
+        }
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.onThemeChanged(checked)
