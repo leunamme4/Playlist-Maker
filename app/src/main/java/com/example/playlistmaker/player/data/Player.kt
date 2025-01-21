@@ -2,18 +2,19 @@ package com.example.playlistmaker.player.data
 
 import android.media.MediaPlayer
 import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import com.example.playlistmaker.search.domain.models.Track
+import org.koin.java.KoinJavaComponent.getKoin
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class Player {
-    private val mediaPlayer = MediaPlayer()
+class Player (private val handler: Handler, private var playTimeRunnable: Runnable) {
+
     private var playerState = STATE_DEFAULT
-    private val handler = Handler(Looper.getMainLooper())
-    private var playTimeRunnable: Runnable = Runnable {}
+    private lateinit var mediaPlayer: MediaPlayer
 
     fun preparePlayer(track: Track, callback: () -> Unit) {
+        mediaPlayer = getKoin().get()
         mediaPlayer.setDataSource(track.previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {

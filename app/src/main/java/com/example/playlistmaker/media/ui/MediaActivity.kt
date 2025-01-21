@@ -1,8 +1,7 @@
 package com.example.playlistmaker.media.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.playlistmaker.R
+import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.databinding.ActivityMediaBinding
 
 class MediaActivity : AppCompatActivity() {

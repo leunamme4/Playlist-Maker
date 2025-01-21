@@ -1,9 +1,14 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.creator.Creator.getThemeInteractor
+import com.example.playlistmaker.di.dataModule
+import com.example.playlistmaker.di.interactorModule
+import com.example.playlistmaker.di.repositoryModule
+import com.example.playlistmaker.di.viewModelModule
 import com.example.playlistmaker.settings.domain.api.ThemeInteractor
+import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : Application() {
 
@@ -12,14 +17,19 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Creator.initApplication(this)
+        startKoin {
+            androidContext(this@App)
+            modules(dataModule, repositoryModule, interactorModule, viewModelModule)
+        }
 
-        themeInteractor = getThemeInteractor()
+        themeInteractor = getKoin().get()
 
         initTheme()
+
     }
 
     private fun initTheme() {
         themeInteractor.themeInit()
     }
+
 }

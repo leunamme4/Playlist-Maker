@@ -3,10 +3,6 @@ package com.example.playlistmaker.player.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.search.domain.api.TracksIntentInteractor
 import com.example.playlistmaker.search.domain.models.Track
@@ -67,16 +63,5 @@ class PlayerViewModel(
 
     private fun getActualTime(): CharSequence {
         return playerInteractor.getActualTime()
-    }
-
-    companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val playerInteractor = Creator.getPlayerInteractor()
-                val tracksIntentInteractor = Creator.getTracksIntentInteractor()
-
-                PlayerViewModel(playerInteractor, tracksIntentInteractor)
-            }
-        }
     }
 }

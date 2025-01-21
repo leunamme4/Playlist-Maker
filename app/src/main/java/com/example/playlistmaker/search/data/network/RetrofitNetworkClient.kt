@@ -3,30 +3,23 @@ package com.example.playlistmaker.search.data.network
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.TracksSearchRequest
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import org.koin.java.KoinJavaComponent.getKoin
 import java.io.IOException
 
-class RetrofitNetworkClient : NetworkClient {
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val tracksApiService = retrofit.create(TracksApiService::class.java)
+class RetrofitNetworkClient (private val tracksApiService: TracksApiService) : NetworkClient {
 
     override fun doRequest(dto: Any): Response {
+        val response: Response = getKoin().get()
         if (dto is TracksSearchRequest) {
             try {
                 val resp = tracksApiService.search(dto.expression).execute()
-                val body = resp.body() ?: Response()
+                val body = resp.body() ?: response
                 return body.apply { resultCode = resp.code() }
             } catch (exception: IOException) {
-                return Response().apply { resultCode = 400 }
+                return response.apply { resultCode = 400 }
             }
         } else {
-            return Response().apply { resultCode = 400 }
+            return response.apply { resultCode = 400 }
         }
     }
 }

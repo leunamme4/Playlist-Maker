@@ -1,14 +1,9 @@
 package com.example.playlistmaker.search.ui
 
 import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.api.SearchUtilsInteractor
 import com.example.playlistmaker.search.domain.api.TracksIntentInteractor
 import com.example.playlistmaker.search.domain.api.TracksInteractor
@@ -17,11 +12,12 @@ import com.example.playlistmaker.search.domain.models.Track
 class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
     private val searchUtilsInteractor: SearchUtilsInteractor,
-    private val tracksIntentInteractor: TracksIntentInteractor
+    private val tracksIntentInteractor: TracksIntentInteractor,
+    private val handler: Handler
 ) : ViewModel() {
 
 
-    val handler = Handler(Looper.getMainLooper())
+    //val handler = Handler(Looper.getMainLooper())
 
     private var tracks = MutableLiveData<List<Track>>(getTrackList())
     fun observeTracks(): LiveData<List<Track>> = tracks
@@ -122,15 +118,5 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
-
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val tracksInteractor = Creator.getTracksInteractor()
-                val searchUtilsInteractor = Creator.getSearchUtilsInteractor()
-                val tracksIntentInteractor = Creator.getTracksIntentInteractor()
-
-                SearchViewModel(tracksInteractor, searchUtilsInteractor, tracksIntentInteractor)
-            }
-        }
     }
 }
