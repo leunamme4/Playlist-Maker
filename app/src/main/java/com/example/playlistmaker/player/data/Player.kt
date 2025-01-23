@@ -8,10 +8,9 @@ import org.koin.java.KoinJavaComponent.getKoin
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class Player (private val handler: Handler, private var playTimeRunnable: Runnable) {
+class Player (private val handler: Handler, private var playTimeRunnable: Runnable, private var mediaPlayer: MediaPlayer) {
 
     private var playerState = STATE_DEFAULT
-    private lateinit var mediaPlayer: MediaPlayer
 
     fun preparePlayer(track: Track, callback: () -> Unit) {
         mediaPlayer = getKoin().get()

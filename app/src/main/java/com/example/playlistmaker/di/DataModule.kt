@@ -70,8 +70,8 @@ val dataModule = module {
         SearchUtils(get())
     }
 
-    single {
-        Player(get(), get())
+    factory {
+        Player(get(), get(), get())
     }
 
     single {

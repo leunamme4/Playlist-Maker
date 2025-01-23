@@ -16,14 +16,9 @@ class SearchViewModel(
     private val handler: Handler
 ) : ViewModel() {
 
+    private var tracks = getTrackList()
 
-    //val handler = Handler(Looper.getMainLooper())
-
-    private var tracks = MutableLiveData<List<Track>>(getTrackList())
-    fun observeTracks(): LiveData<List<Track>> = tracks
-
-    private var history = MutableLiveData<List<Track>>(getTracksHistory())
-    fun observeHistory(): LiveData<List<Track>> = history
+    private var history = getTracksHistory()
 
     // state
     private var searchState = MutableLiveData<SearchState>()
@@ -58,7 +53,7 @@ class SearchViewModel(
                     handler.post { setState(SearchState.NoConnection) }
                 } else if (foundTracks.isNotEmpty()) {
                     tracksInteractor.addAllTracks(foundTracks)
-                    handler.post { setState(SearchState.Content) }
+                    handler.post { setState(SearchState.Content(tracks)) }
                 } else {
                     handler.post { setState(SearchState.Empty) }
                 }
@@ -77,7 +72,7 @@ class SearchViewModel(
     fun clearHistory() {
         tracksInteractor.clearHistory(object : TracksInteractor.TracksHistoryConsumer {
             override fun consume() {
-                history.value = getTracksHistory()
+                history = getTracksHistory()
                 setState(SearchState.Default)
             }
         }
@@ -91,7 +86,7 @@ class SearchViewModel(
     fun updateHistory(track: Track) {
         if (clickDebounce()) {
             tracksInteractor.updateHistory(track)
-            history.value = getTracksHistory()
+            history = getTracksHistory()
         }
     }
 
@@ -113,6 +108,10 @@ class SearchViewModel(
 
     fun removeCallbacks() {
         handler.removeCallbacks(searchRunnable)
+    }
+
+    fun setHistoryState() {
+        setState(SearchState.History(history))
     }
 
 
