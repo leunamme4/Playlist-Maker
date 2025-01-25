@@ -9,6 +9,10 @@
     <string name="agreement">Пользовательское соглашение</string>
     <string name="back_desc">Назад</string>
     <string name="search">Поиск</string>
+    <string name="media">Медиатека</string>
+    <string name="favorites">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
+    <string name="new_playlist">Новый плейлист</string>
     <string name="practicum_url">https://practicum.yandex.ru/android-developer/?from=catalog</string>
     <string name="support_message">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
@@ -17,6 +21,8 @@
     <string name="agreement_offer">https://yandex.ru/legal/practicum_offer</string>
     <string name="sharing_type">text/plain</string>
     <string name="no_results">Ничего не нашлось</string>
+    <string name="no_playlists">Вы не создали\nни одного плейлиста</string>
+    <string name="media_empty">Ваша медиатека пуста</string>
     <string name="no_connection">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="renew_button">Обновить</string>
     <string name="search_history_text">Вы искали</string>
