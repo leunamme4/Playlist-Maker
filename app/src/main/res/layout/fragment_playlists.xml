@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="106dp">
+        android:layout_marginTop="@dimen/media_fragments_empty">
 
         <ImageView
             android:id="@+id/no_content"
@@ -41,15 +41,8 @@
             android:id="@+id/no_content_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/ys_display_medium"
-            android:paddingHorizontal="24dp"
             android:text="@string/no_playlists"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textFontWeight="500"
-            android:textSize="@dimen/search_errors_textSize" />
+            style="@style/media_empty_text"/>
     </LinearLayout>
 
 </FrameLayout>
