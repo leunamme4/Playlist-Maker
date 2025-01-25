@@ -1,17 +1,16 @@
 package com.example.playlistmaker.search.data.dto
 
-import com.example.playlistmaker.creator.Creator
+import android.content.SharedPreferences
 import com.example.playlistmaker.HISTORY_KEY
 import com.google.gson.Gson
 
-class SearchHistory {
-    private val sharedPreferences = Creator.provideSharedPreferences()
+class SearchHistory(private val sharedPreferences: SharedPreferences, private val gson: Gson) {
     val historyArrayList: ArrayList<TrackDto> = ArrayList()
 
     init {
         val historyJson = sharedPreferences.getString(HISTORY_KEY, null)
         val historyArray =
-            Gson().fromJson(historyJson, Array<TrackDto>::class.java) ?: emptyArray<TrackDto>()
+            gson.fromJson(historyJson, Array<TrackDto>::class.java) ?: emptyArray<TrackDto>()
         historyArrayList.addAll(historyArray)
         historyArrayList.reverse()
     }
@@ -32,7 +31,7 @@ class SearchHistory {
         historyArrayList.add(0, track)
 
         sharedPreferences.edit()
-            .putString(HISTORY_KEY, Gson().toJson(historyArrayList))
+            .putString(HISTORY_KEY, gson.toJson(historyArrayList))
             .apply()
     }
 

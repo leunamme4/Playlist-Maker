@@ -1,11 +1,10 @@
 package com.example.playlistmaker.search.data.dto
 
+import android.content.SharedPreferences
 import com.example.playlistmaker.TRACK_PLAYER_KEY
-import com.example.playlistmaker.creator.Creator
 import com.google.gson.Gson
 
-class TracksIntent {
-    private val sharedPreferences = Creator.provideSharedPreferences()
+class TracksIntent (private val sharedPreferences: SharedPreferences, private val gson: Gson) {
 
     fun setPlayerTrack(trackDto: TrackDto) {
         sharedPreferences.edit()
@@ -14,6 +13,6 @@ class TracksIntent {
     }
 
     fun getPlayerTrack(): TrackDto {
-        return Gson().fromJson(sharedPreferences.getString(TRACK_PLAYER_KEY, ""), TrackDto::class.java)
+        return gson.fromJson(sharedPreferences.getString(TRACK_PLAYER_KEY, ""), TrackDto::class.java)
     }
 }

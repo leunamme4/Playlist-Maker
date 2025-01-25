@@ -1,13 +1,12 @@
 package com.example.playlistmaker.settings.data
 
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.creator.Creator.provideThemeSharedPreferences
 import com.example.playlistmaker.THEME
 
 
-class ThemeControl {
+class ThemeControl (private val sharedPreferences: SharedPreferences) {
     private var darkTheme = false
-    private val sharedPreferences = provideThemeSharedPreferences()
 
     private fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled

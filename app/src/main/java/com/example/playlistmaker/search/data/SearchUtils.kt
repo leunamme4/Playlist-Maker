@@ -1,14 +1,13 @@
 package com.example.playlistmaker.search.data
 
 import android.os.Handler
-import android.os.Looper
 
-class SearchUtils {
+class SearchUtils (private val handler: Handler) {
     var editTextValue = TEXT_DEFAULT
     var lastSearch = ""
     var isClickAllowed = true
 
-    private val handler = Handler(Looper.getMainLooper())
+    //private val handler = Handler(Looper.getMainLooper())
 
     fun clickDebounce(): Boolean {
         val current = isClickAllowed
