@@ -28,4 +28,6 @@
     <string name="search_history_text">Вы искали</string>
     <string name="search_clear_history">Очистить историю</string>
     <string name="track_play_start">00:00</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
