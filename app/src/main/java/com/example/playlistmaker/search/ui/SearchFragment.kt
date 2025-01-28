@@ -1,11 +1,12 @@
 package com.example.playlistmaker.search.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -13,17 +14,18 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.ScrollView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
     private lateinit var trackListAdapter: TracksAdapter
     private lateinit var historyAdapter: HistoryAdapter
@@ -33,20 +35,26 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var renewButton: Button
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageButton
-    private lateinit var backButton: ImageButton
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var historyLayout: LinearLayout
     private lateinit var historyClearButton: Button
     private lateinit var progressBar: ProgressBar
 
-    private lateinit var binding: ActivitySearchBinding
-
     private val viewModel by viewModel<SearchViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         historyAdapter = HistoryAdapter(emptyList()) { track ->
             viewModel.updateHistory(track)
@@ -61,7 +69,6 @@ class SearchActivity : AppCompatActivity() {
 
         searchEditText = binding.searchEdit
         clearButton = binding.clearButton
-        backButton = binding.backButton
         tracksRecyclerView = binding.recyclerTracks
         noResultsPlaceholder = binding.noResults
         noConnectionPlaceholder = binding.noConnection
@@ -73,14 +80,14 @@ class SearchActivity : AppCompatActivity() {
         var newLastValue = TEXT_DEFAULT
 
         // tracks RV
-        tracksRecyclerView.layoutManager = LinearLayoutManager(this)
+        tracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         tracksRecyclerView.adapter = trackListAdapter
 
         // history RV
-        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         historyRecyclerView.adapter = historyAdapter
 
-        viewModel.getSearchState().observe(this) { screenState ->
+        viewModel.getSearchState().observe(viewLifecycleOwner) { screenState ->
             when (screenState) {
                 is SearchState.Default -> {
                     renderScreenState(
@@ -151,9 +158,6 @@ class SearchActivity : AppCompatActivity() {
 
         }
 
-        //backButton
-        backButton.setOnClickListener { this.finish() }
-
         // clear
         clearButton.setOnClickListener { clearEditText() }
 
@@ -198,16 +202,17 @@ class SearchActivity : AppCompatActivity() {
 
     private fun hideKeyboard() {
         val inputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
 
     private fun trackIntent(track: Track) {
         hideKeyboard()
-        val navigationIntent =
-            Intent(this@SearchActivity, PlayerActivity::class.java)
+//        val navigationIntent =
+//            Intent(requireContext(), PlayerActivity::class.java)
         viewModel.trackTransition(track)
-        startActivity(navigationIntent)
+        findNavController().navigate(R.id.action_searchFragment_to_playerActivity)
+        //startActivity(navigationIntent)
     }
 
     private fun clearEditText() {

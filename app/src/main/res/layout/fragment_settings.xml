@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".settings.ui.SettingsFragment">
+
+    <TextView
+        android:id="@+id/text_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/head_layout_height"
+        android:background="@color/white"
+        android:fontFamily="@font/ys_display_medium"
+        android:gravity="center"
+        android:paddingStart="16dp"
+        android:text="@string/settings_button"
+        android:textColor="@color/settings_text_black"
+        android:textFontWeight="500"
+        android:textSize="@dimen/main_buttons_text"
+        app:layout_constraintBottom_toTopOf="@id/settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/settings"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/text_settings"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:paddingTop="0dp">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/theme_switcher"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/settings_layouts_height"
+                android:layout_marginTop="24dp"
+                android:background="@color/white"
+                android:fontFamily="@font/ys_display_regular"
+                android:paddingStart="@dimen/settings_padding_start"
+                android:text="@string/black_mode"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textFontWeight="400"
+                android:textSize="@dimen/settings_text"
+                app:thumbTint="@color/switch_thumb"
+                app:trackTint="@color/switch_track" />
+
+            <FrameLayout
+                android:id="@+id/app_sharing"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/settings_layouts_height">
+
+                <TextView
+                    style="@style/SettingsText"
+                    android:text="@string/share" />
+
+                <ImageView
+                    style="@style/SettingsMenuIcon"
+                    android:src="@drawable/share_button"
+                    app:tint="@color/settings_icon" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/support"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/settings_layouts_height">
+
+                <TextView
+                    style="@style/SettingsText"
+                    android:text="@string/support" />
+
+                <ImageView
+                    style="@style/SettingsMenuIcon"
+                    android:src="@drawable/support_button"
+                    app:tint="@color/settings_icon" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/agreement"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/settings_layouts_height">
+
+                <TextView
+                    style="@style/SettingsText"
+                    android:text="@string/agreement" />
+
+                <ImageView
+                    style="@style/SettingsMenuIcon"
+                    android:src="@drawable/agreement_button"
+                    app:tint="@color/settings_icon" />
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

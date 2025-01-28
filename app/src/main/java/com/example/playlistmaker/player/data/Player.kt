@@ -2,7 +2,6 @@ package com.example.playlistmaker.player.data
 
 import android.media.MediaPlayer
 import android.os.Handler
-import android.util.Log
 import com.example.playlistmaker.search.domain.models.Track
 import org.koin.java.KoinJavaComponent.getKoin
 import java.text.SimpleDateFormat

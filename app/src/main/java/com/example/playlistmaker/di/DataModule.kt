@@ -10,11 +10,9 @@ import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.SearchUtils
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.SearchHistory
-import com.example.playlistmaker.search.data.dto.TrackDto
 import com.example.playlistmaker.search.data.dto.TracksIntent
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.search.data.network.TracksApiService
-import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.settings.data.ThemeControl
 import com.example.playlistmaker.sharing.data.ExternalNavigator
 import com.google.gson.Gson

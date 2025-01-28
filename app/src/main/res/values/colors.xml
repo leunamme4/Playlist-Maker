@@ -17,4 +17,5 @@
     <color name="switch_thumb_disable">#AEAFB4</color>
     <color name="switch_track_disable">#E6E8EB</color>
     <color name="player_attributes">#AEAFB4</color>
+    <color name="bottom_nav_border">#E6E8EB</color>
 </resources>
