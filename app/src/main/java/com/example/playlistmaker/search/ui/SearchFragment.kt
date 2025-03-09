@@ -20,7 +20,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -182,7 +181,7 @@ class SearchFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.removeCallbacks()
+                viewModel.cancelSearch()
                 clearButton.isGone = s.isNullOrEmpty()
                 val lastValue = newLastValue
                 newLastValue = s.toString()
@@ -191,7 +190,7 @@ class SearchFragment : Fragment() {
                 ) viewModel.setHistoryState() else historyLayout.visibility =
                     View.GONE
                 if (searchEditText.text.toString() != lastValue && !s.isNullOrEmpty()) {
-                    viewModel.runnableTask()
+                    viewModel.searchTask()
                 }
             }
 
@@ -208,11 +207,8 @@ class SearchFragment : Fragment() {
 
     private fun trackIntent(track: Track) {
         hideKeyboard()
-//        val navigationIntent =
-//            Intent(requireContext(), PlayerActivity::class.java)
         viewModel.trackTransition(track)
         findNavController().navigate(R.id.action_searchFragment_to_playerActivity)
-        //startActivity(navigationIntent)
     }
 
     private fun clearEditText() {

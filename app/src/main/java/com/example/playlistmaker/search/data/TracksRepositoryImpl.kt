@@ -6,6 +6,8 @@ import com.example.playlistmaker.search.data.dto.TracksSearchRequest
 import com.example.playlistmaker.search.data.dto.TracksSearchResponse
 import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -14,11 +16,11 @@ class TracksRepositoryImpl(
     private val history: SearchHistory
 ) : TracksRepository {
 
-    override fun searchTracks(expression: String): Pair<List<Track>, Boolean> {
+    override fun searchTracks(expression: String): Flow<Pair<List<Track>, Boolean>> = flow {
         val response = networkClient.doRequest(TracksSearchRequest(expression))
 
         if (response.resultCode == 200) {
-            return Pair((response as TracksSearchResponse).results.map {
+            emit(Pair((response as TracksSearchResponse).results.map {
                 it.trackTimeMillis = SimpleDateFormat(
                     "mm:ss",
                     Locale.getDefault()
@@ -35,9 +37,9 @@ class TracksRepositoryImpl(
                     it.country,
                     it.previewUrl
                 )
-            }, true)
+            }, true))
         } else {
-            return Pair(emptyList(), false)
+            emit(Pair(emptyList(), false))
         }
     }
 
