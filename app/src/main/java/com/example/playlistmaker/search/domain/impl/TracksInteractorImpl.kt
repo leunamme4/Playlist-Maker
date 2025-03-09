@@ -4,18 +4,16 @@ import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.models.TrackList
-import java.util.concurrent.Executors
+import kotlinx.coroutines.flow.Flow
 
-class TracksInteractorImpl(private val tracksRepository: TracksRepository, private val trackList: TrackList) :
+class TracksInteractorImpl(
+    private val tracksRepository: TracksRepository,
+    private val trackList: TrackList
+) :
     TracksInteractor {
 
-    private val executor = Executors.newCachedThreadPool()
-
-    override fun searchTracks(expression: String, consumer: TracksInteractor.TracksConsumer) {
-        executor.execute {
-            val tracks = tracksRepository.searchTracks(expression)
-            consumer.consume(tracks.first, tracks.second)
-        }
+    override fun searchTracks(expression: String): Flow<Pair<List<Track>, Boolean>> {
+        return tracksRepository.searchTracks(expression)
     }
 
     override fun updateHistory(track: Track) {
