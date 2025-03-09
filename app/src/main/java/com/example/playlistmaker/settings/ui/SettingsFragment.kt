@@ -1,27 +1,37 @@
 package com.example.playlistmaker.settings.ui
 
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.playlistmaker.databinding.FragmentSearchBinding
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.settings.data.CheckedState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment: Fragment() {
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel by viewModel<SettingsViewModel>()
-    private lateinit var binding: ActivitySettingsBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("theme", "theme")
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         viewModel.initChecked()
 
         val themeSwitcher = binding.themeSwitcher
-        viewModel.observeDarkTheme().observe(this) {
+        viewModel.observeDarkTheme().observe(viewLifecycleOwner) {
             if (it !is CheckedState.None) {
                 themeSwitcher.isChecked = it is CheckedState.Checked
                 viewModel.setState(CheckedState.None)
@@ -31,13 +41,6 @@ class SettingsActivity : AppCompatActivity() {
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.onThemeChanged(checked)
         }
-
-        //backButton
-        val backButton = binding.backButton
-        val backClickListener: View.OnClickListener = View.OnClickListener {
-            this.finish()
-        }
-        backButton.setOnClickListener(backClickListener)
 
         //sharing
         val shareButton = binding.appSharing
@@ -60,4 +63,5 @@ class SettingsActivity : AppCompatActivity() {
         }
         agreementButton.setOnClickListener(agreementClickListener)
     }
+
 }
