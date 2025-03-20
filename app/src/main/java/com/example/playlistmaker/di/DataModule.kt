@@ -5,9 +5,7 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import com.example.playlistmaker.PREFERENCES
-import com.example.playlistmaker.player.data.Player
 import com.example.playlistmaker.search.data.NetworkClient
-import com.example.playlistmaker.search.data.SearchUtils
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.SearchHistory
 import com.example.playlistmaker.search.data.dto.TracksIntent
@@ -62,14 +60,6 @@ val dataModule = module {
 
     factory {
         TracksIntent(get(), get())
-    }
-
-    single {
-        SearchUtils(get())
-    }
-
-    factory {
-        Player(get(), get(), get())
     }
 
     single {

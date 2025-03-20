@@ -1,24 +1,30 @@
 package com.example.playlistmaker.search.ui
 
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.search.domain.api.SearchUtilsInteractor
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.api.TracksIntentInteractor
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
-    private val searchUtilsInteractor: SearchUtilsInteractor,
-    private val tracksIntentInteractor: TracksIntentInteractor,
-    private val handler: Handler
+    private val tracksIntentInteractor: TracksIntentInteractor
 ) : ViewModel() {
 
     private var tracks = getTrackList()
 
     private var history = getTracksHistory()
+
+    private var searchJob: Job? = null
+
+    private var editTextValue = TEXT_DEFAULT
+    private var lastSearch = ""
+    private var isClickAllowed = true
 
     // state
     private var searchState = MutableLiveData<SearchState>()
@@ -29,36 +35,27 @@ class SearchViewModel(
     }
 
     fun setEditTextValue(text: String) {
-        searchUtilsInteractor.setEditTextValue(text)
-    }
-
-    private fun getLastSearch(): String {
-        return searchUtilsInteractor.getLastSearch()
-    }
-
-    private fun setLastSearch(text: String) {
-        searchUtilsInteractor.setLastSearch(text)
+        editTextValue = text
     }
 
     fun search(text: String) {
-        val searchText = if (text == "") getLastSearch() else text
+        val searchText = if (text == "") lastSearch else text
         setState(SearchState.Loading)
-        setLastSearch(searchText)
+        lastSearch = searchText
         tracksInteractor.clearTracks()
 
-        tracksInteractor.searchTracks(searchText, object : TracksInteractor.TracksConsumer {
-            override fun consume(foundTracks: List<Track>, status: Boolean) {
-                tracksInteractor.clearTracks()
-                if (!status) {
-                    handler.post { setState(SearchState.NoConnection) }
-                } else if (foundTracks.isNotEmpty()) {
-                    tracksInteractor.addAllTracks(foundTracks)
-                    handler.post { setState(SearchState.Content(tracks)) }
-                } else {
-                    handler.post { setState(SearchState.Empty) }
+        viewModelScope.launch {
+            tracksInteractor.searchTracks(searchText)
+                .collect { pair ->
+                    if (!pair.second) { setState(SearchState.NoConnection) }
+                    else if (pair.first.isNotEmpty()) {
+                        tracksInteractor.addAllTracks(pair.first)
+                        setState(SearchState.Content(tracks))
+                    } else {
+                        setState(SearchState.Empty)
+                    }
                 }
-            }
-        })
+        }
     }
 
     private fun getTracksHistory(): List<Track> {
@@ -91,23 +88,28 @@ class SearchViewModel(
     }
 
     private fun clickDebounce(): Boolean {
-        return searchUtilsInteractor.clickDebounce()
-    }
-
-    private val searchRunnable = searchUtilsInteractor.getSearchRunnable(object :
-        SearchUtilsInteractor.SearchRunnableConsume {
-        override fun consume() {
-            search(searchUtilsInteractor.getEditTextValue())
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            viewModelScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
-
-    })
-
-    fun runnableTask() {
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_MILLIS)
+        return current
     }
 
-    fun removeCallbacks() {
-        handler.removeCallbacks(searchRunnable)
+    fun searchTask() {
+        cancelSearch()
+        searchJob = viewModelScope.launch {
+            lastSearch = editTextValue
+            delay(SEARCH_DEBOUNCE_DELAY_MILLIS)
+            search(editTextValue)
+        }
+    }
+
+    fun cancelSearch() {
+        searchJob?.cancel()
     }
 
     fun setHistoryState() {
@@ -117,5 +119,7 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
+        private const val TEXT_DEFAULT = ""
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
