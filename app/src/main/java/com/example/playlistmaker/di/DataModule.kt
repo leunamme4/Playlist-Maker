@@ -4,13 +4,16 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
+import androidx.room.Room
 import com.example.playlistmaker.PREFERENCES
+import com.example.playlistmaker.db.AppDatabase
+import com.example.playlistmaker.media.data.Converter
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.SearchHistory
-import com.example.playlistmaker.search.data.dto.TracksIntent
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.search.data.network.TracksApiService
+import com.example.playlistmaker.search.domain.models.TracksIntent
 import com.example.playlistmaker.settings.data.ThemeControl
 import com.example.playlistmaker.sharing.data.ExternalNavigator
 import com.google.gson.Gson
@@ -74,5 +77,11 @@ val dataModule = module {
         RetrofitNetworkClient(get())
     }
 
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db").build()
+    }
 
+    single {
+        Converter()
+    }
 }

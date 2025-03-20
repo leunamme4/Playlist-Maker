@@ -1,13 +1,13 @@
-package com.example.playlistmaker.search.data
+package com.example.playlistmaker.search.domain.impl
 
-import com.example.playlistmaker.search.data.dto.TrackDto
-import com.example.playlistmaker.search.data.dto.TracksIntent
+import com.example.playlistmaker.db.AppDatabase
 import com.example.playlistmaker.search.domain.api.TracksIntentRepository
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.search.domain.models.TracksIntent
 
-class TracksIntentRepositoryImpl(private val tracksIntent: TracksIntent): TracksIntentRepository {
+class TracksIntentRepositoryImpl(private val tracksIntent: TracksIntent, private val database: AppDatabase): TracksIntentRepository {
     override fun setPlayerTrack(track: Track) {
-        tracksIntent.setPlayerTrack(track.let { TrackDto(
+        tracksIntent.setPlayerTrack(track.let { Track(
             it.trackName,
             it.artistName,
             it.trackTimeMillis,
@@ -17,11 +17,12 @@ class TracksIntentRepositoryImpl(private val tracksIntent: TracksIntent): Tracks
             it.releaseDate,
             it.primaryGenreName,
             it.country,
-            it.previewUrl
+            it.previewUrl,
+            it.isFavorite
         ) })
     }
 
-    override fun getPlayerTrack(): Track {
+    override suspend fun getPlayerTrack(): Track {
         return tracksIntent.getPlayerTrack().let { Track(
             it.trackName,
             it.artistName,
@@ -32,7 +33,8 @@ class TracksIntentRepositoryImpl(private val tracksIntent: TracksIntent): Tracks
             it.releaseDate,
             it.primaryGenreName,
             it.country,
-            it.previewUrl
+            it.previewUrl,
+            database.TracksDao().getFavoritesId().contains(it.trackId)
         ) }
     }
 }

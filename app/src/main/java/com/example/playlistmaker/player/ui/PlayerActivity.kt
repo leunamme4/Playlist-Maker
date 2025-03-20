@@ -16,6 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
+    private lateinit var likeButton: ImageButton
     private lateinit var nameData: TextView
     private lateinit var artistData: TextView
     private lateinit var timeData: TextView
@@ -49,6 +50,7 @@ class PlayerActivity : AppCompatActivity() {
         cover = binding.cover
         albumGroup = binding.albumGroup
         playButton = binding.playButton
+        likeButton = binding.likeButton
 
         //backButton
         val backClickListener: View.OnClickListener = View.OnClickListener {
@@ -56,37 +58,48 @@ class PlayerActivity : AppCompatActivity() {
         }
         backButton.setOnClickListener(backClickListener)
 
-        viewModel.observeTrack().observe(this) {
-            trackInflate(it)
+        fun startPlayer() {
+            viewModel.getPlayerScreenState().observe(this) { screenState ->
+                when (screenState) {
+                    is PlayerState.Paused -> {
+                        loadPlayButton(R.drawable.play)
+                        actualTime.text = screenState.time
+                    }
+
+                    is PlayerState.Playing -> {
+                        loadPlayButton(R.drawable.pause)
+                        actualTime.text = screenState.time
+                    }
+
+                    is PlayerState.Prepared -> {
+                        actualTime.text = getString(R.string.track_play_start)
+                        loadPlayButton(R.drawable.play)
+                    }
+
+                    is PlayerState.Created -> {
+                        viewModel.preparePlayer()
+                    }
+
+                    else -> {}
+                }
+            }
         }
 
-        viewModel.getPlayerScreenState().observe(this) { screenState ->
-            when (screenState) {
-                is PlayerState.Paused -> {
-                    loadPlayButton(R.drawable.play)
-                    actualTime.text = screenState.time
-                }
+        viewModel.observeTrack().observe(this) {
+            trackInflate(it)
+            startPlayer()
+        }
 
-                is PlayerState.Playing -> {
-                    loadPlayButton(R.drawable.pause)
-                    actualTime.text = screenState.time
-                }
-
-                is PlayerState.Prepared -> {
-                    actualTime.text = getString(R.string.track_play_start)
-                    loadPlayButton(R.drawable.play)
-                }
-
-                is PlayerState.Created -> {
-                    viewModel.preparePlayer()
-                }
-
-                else -> {}
-            }
+        viewModel.observeFavorite().observe(this) { isFavorite ->
+            loadLikeButton(isFavorite)
         }
 
         playButton.setOnClickListener {
             viewModel.playControl()
+        }
+
+        likeButton.setOnClickListener {
+            viewModel.onFavoriteClick()
         }
     }
 
@@ -115,6 +128,12 @@ class PlayerActivity : AppCompatActivity() {
             .placeholder(R.drawable.placeholder_player_light)
             .transform(RoundedCorners(cover.context.resources.getDimensionPixelSize(R.dimen.player_cover_corner_radius)))
             .into(cover)
+    }
+
+    private fun loadLikeButton(isFavorite: Boolean) {
+        if (isFavorite) {
+            likeButton.setImageResource(R.drawable.liked)
+        } else likeButton.setImageResource(R.drawable.like)
     }
 
     private fun loadPlayButton(resourceId: Int) {
