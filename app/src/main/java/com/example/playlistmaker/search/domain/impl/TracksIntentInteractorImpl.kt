@@ -9,7 +9,7 @@ class TracksIntentInteractorImpl(private val tracksIntentRepository: TracksInten
         tracksIntentRepository.setPlayerTrack(track)
     }
 
-    override fun getPlayerTrack(): Track {
+    override suspend fun getPlayerTrack(): Track {
         return tracksIntentRepository.getPlayerTrack()
     }
 }

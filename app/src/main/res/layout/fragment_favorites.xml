@@ -8,19 +8,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".media.ui.FavoritesFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_favorites"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
     <ImageView
         android:id="@+id/no_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/media_fragments_empty"
-        android:src="@drawable/noresults_placeholder" />
+        android:src="@drawable/noresults_placeholder"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/no_content_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/media_empty"
+        android:visibility="gone"
         style="@style/media_empty_text" />
 
 </LinearLayout>

@@ -5,5 +5,5 @@ import com.example.playlistmaker.search.domain.models.Track
 interface TracksIntentInteractor {
     fun setPlayerTrack(track: Track)
 
-    fun getPlayerTrack(): Track
+    suspend fun getPlayerTrack(): Track
 }
