@@ -18,7 +18,7 @@ class SearchViewModel(
 
     private var tracks = getTrackList()
 
-    private var history = getTracksHistory()
+    private var history = getTracksHistory().reversed()
 
     private var searchJob: Job? = null
 

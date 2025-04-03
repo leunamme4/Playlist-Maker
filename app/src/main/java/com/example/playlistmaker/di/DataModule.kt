@@ -7,7 +7,8 @@ import android.os.Looper
 import androidx.room.Room
 import com.example.playlistmaker.PREFERENCES
 import com.example.playlistmaker.db.AppDatabase
-import com.example.playlistmaker.media.data.Converter
+import com.example.playlistmaker.media.data.PlaylistConverter
+import com.example.playlistmaker.media.data.TrackConverter
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.SearchHistory
@@ -78,10 +79,14 @@ val dataModule = module {
     }
 
     single {
-        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db").build()
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database2.db").build()
     }
 
     single {
-        Converter()
+        TrackConverter()
+    }
+
+    single {
+        PlaylistConverter()
     }
 }

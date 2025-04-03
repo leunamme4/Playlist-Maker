@@ -6,7 +6,7 @@ import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FavoritesRepositoryImpl(private val database: AppDatabase, private val converter: Converter) :
+class FavoritesRepositoryImpl(private val database: AppDatabase, private val converter: TrackConverter) :
     FavoritesRepository {
     override suspend fun addToFavorites(track: Track) {
         database.TracksDao().addToFavorites(converter.map(track))
