@@ -27,6 +27,18 @@ class PlaylistsRepositoryImpl(
         database.playlistsDao().addPlaylist(playlistEntity)
     }
 
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        val playlistEntity = PlaylistEntity(
+            id = playlist.id,
+            name = playlist.name,
+            description = playlist.description,
+            coverPath = playlist.coverPath,
+            trackListIds = playlist.trackListIds,
+            tracksCount = playlist.tracksCount
+        )
+        database.playlistsDao().addPlaylist(playlistEntity)
+    }
+
     override fun getPlaylists(): Flow<List<Playlist>> = flow {
         emit(database.playlistsDao().getPlaylists().map { converter.map(it) })
     }
@@ -49,5 +61,71 @@ class PlaylistsRepositoryImpl(
 
         database.playlistsDao().addPlaylist(converter.map(playlist))
     }
+
+    override suspend fun getPlaylistById(id: Int): Playlist {
+        val playlistEntity = database.playlistsDao().getPlaylistById(id)
+        val playlist = playlistEntity.let {
+            Playlist(
+                it.id,
+                it.name,
+                it.description,
+                it.coverPath,
+                it.trackListIds,
+                it.tracksCount
+            )
+        }
+
+        return playlist
+    }
+
+    override fun getTracksInPlaylist(ids: List<Int>): Flow<List<Track>> = flow {
+        emit(
+            database.tracksPlaylistDao().getTracks(ids).toMutableList()
+                .sortedByDescending { it.addedTime }
+                .map { trackConverter.mapInPlaylist(it) })
+    }
+
+    override suspend fun deleteTrackById(trackId: Int, playlist: Playlist) {
+        val playlists = database.playlistsDao().getPlaylists()
+
+        playlists.forEach {
+            val listType: Type = object : TypeToken<List<Int>>() {}.type
+            val idsInPlaylist: List<Int>? = Gson().fromJson(it.trackListIds, listType)
+            if (idsInPlaylist?.contains(trackId) == true && it.id != playlist.id) {
+                val listOfIds = mutableListOf<Int>()
+                listOfIds.addAll(idsInPlaylist)
+                listOfIds.remove(trackId)
+                playlist.tracksCount--
+                playlist.trackListIds = Gson().toJson(listOfIds)
+                database.playlistsDao().addPlaylist(converter.map(playlist))
+                return
+            }
+        }
+
+        val listOfIds = mutableListOf<Int>()
+        val listType: Type = object : TypeToken<List<Int>>() {}.type
+        val idsInPlaylist: List<Int>? = Gson().fromJson(playlist.trackListIds, listType)
+        if (idsInPlaylist != null) {
+            listOfIds.addAll(idsInPlaylist)
+            listOfIds.remove(trackId)
+        }
+        playlist.trackListIds = Gson().toJson(listOfIds)
+        playlist.tracksCount--
+        database.playlistsDao().addPlaylist(converter.map(playlist))
+
+        database.tracksPlaylistDao().deleteTrackById(trackId)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        val listType: Type = object : TypeToken<List<Int>>() {}.type
+        val idsInPlaylist: List<Int>? = Gson().fromJson(playlist.trackListIds, listType)
+
+        idsInPlaylist?.forEach {
+            deleteTrackById(it, playlist)
+        }
+
+        database.playlistsDao().deletePlaylist(playlist.id)
+    }
+
 
 }

@@ -23,6 +23,7 @@
     <string name="no_results">Ничего не нашлось</string>
     <string name="no_playlists">Вы не создали\nни одного плейлиста</string>
     <string name="media_empty">Ваша медиатека пуста</string>
+    <string name="playlist_empty">Плейлист пуст</string>
     <string name="no_connection">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="renew_button">Обновить</string>
     <string name="search_history_text">Вы искали</string>

@@ -59,7 +59,7 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun renderState(state: FavoritesState) {
-        when(state) {
+        when (state) {
             is FavoritesState.Content -> rvInit(state.tracks)
             FavoritesState.Empty -> emptyState()
         }
@@ -67,9 +67,8 @@ class FavoritesFragment : Fragment() {
 
     // tracks RV
     private fun rvInit(tracks: List<Track>) {
-        trackListAdapter = TracksAdapter(tracks) { track ->
-            trackIntent(track)
-        }
+        trackListAdapter = TracksAdapter(tracks,
+            listener = { track -> trackIntent(track) })
         trackListAdapter.notifyDataSetChanged()
         tracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         tracksRecyclerView.adapter = trackListAdapter

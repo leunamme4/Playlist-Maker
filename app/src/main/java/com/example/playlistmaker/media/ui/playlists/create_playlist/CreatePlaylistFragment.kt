@@ -1,4 +1,4 @@
-package com.example.playlistmaker.media.ui.playlists
+package com.example.playlistmaker.media.ui.playlists.create_playlist
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
+import com.example.playlistmaker.media.domain.models.Playlist
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.root.RootActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,12 +36,8 @@ class CreatePlaylistFragment : Fragment() {
 
     private val viewModel by viewModel<CreatePlaylistViewModel>()
 
+
     private var actualUri: Uri? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,6 +50,26 @@ class CreatePlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (arguments != null) {
+            viewModel.getPlaylistById(requireArguments().getInt("id"))
+        }
+
+        fun editedPlaylistInflate(playlist: Playlist) {
+            binding.saveButton.text = "Сохранить"
+            binding.etNameText.setText(playlist.name)
+            binding.etDescriptionText.setText(playlist.description)
+            Glide.with(binding.cover)
+                .load(playlist.coverPath)
+                .placeholder(R.drawable.track_cover_placeholder)
+                .transform(RoundedCorners(binding.cover.context.resources.getDimensionPixelSize(R.dimen.player_cover_corner_radius)))
+                .centerCrop()
+                .into(binding.cover)
+        }
+
+        viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
+            editedPlaylistInflate(playlist)
+        }
 
         //регистрируем событие, которое вызывает photo picker
         val pickMedia =
@@ -70,22 +87,26 @@ class CreatePlaylistFragment : Fragment() {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-        //по нажатию на кнопку loadImageFromStorage пытаемся загрузить фотографию из нашего хранилища
-//        binding.loadImageFromStorage.setOnClickListener {
-//            val filePath = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
-//            val file = File(filePath, "first_cover.jpg")
-//            binding.storageImage.setImageURI(file.toUri())
-//        }
+        fun toast(status: String) {
+            Toast.makeText(activity, "Плейлист ${viewModel.getName()} $status", Toast.LENGTH_LONG)
+                .show()
+        }
 
         // сохранение
         binding.saveButton.setOnClickListener {
             actualUri?.also { saveImageToPrivateStorage(it) }
-            viewModel.addPlaylist(
+            if (arguments == null) {
+                viewModel.addPlaylist(
+                    binding.etNameText.text.toString(),
+                    binding.etDescriptionText.text.toString()
+                )
+            } else viewModel.updatePlaylist(
                 binding.etNameText.text.toString(),
                 binding.etDescriptionText.text.toString()
             )
-            Toast.makeText(activity, "Плейлист ${viewModel.getName()} создан", Toast.LENGTH_LONG)
-                .show();
+            if (arguments == null) {
+                toast("создан")
+            } else toast("обновлён")
             finishFragment()
         }
 
@@ -106,11 +127,11 @@ class CreatePlaylistFragment : Fragment() {
 
         // обработка нажатия на кнопку назад
         val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
-            requireDialog()
+            if (arguments != null) finishFragment() else requireDialog()
         }
         callback.isEnabled
         binding.backButton.setOnClickListener {
-            requireDialog()
+            if (arguments != null) finishFragment() else requireDialog()
         }
     }
 
@@ -156,12 +177,11 @@ class CreatePlaylistFragment : Fragment() {
         viewModel.addCover(file.absolutePath)
 
         Glide.with(binding.cover)
-            .load(uri)
+            .load(file.absolutePath)
+            .placeholder(R.drawable.track_cover_placeholder)
+            //.transform(RoundedCorners(binding.cover.context.resources.getDimensionPixelSize(R.dimen.player_cover_corner_radius)))
             .centerCrop()
-            .placeholder(R.drawable.placeholder_player_light)
-            .transform(RoundedCorners(binding.cover.context.resources.getDimensionPixelSize(R.dimen.player_cover_corner_radius)))
             .into(binding.cover)
-
 
     }
 

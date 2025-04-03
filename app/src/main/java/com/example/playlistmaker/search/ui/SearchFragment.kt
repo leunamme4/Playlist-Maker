@@ -61,10 +61,10 @@ class SearchFragment : Fragment() {
             trackIntent(track)
         }
 
-        trackListAdapter = TracksAdapter(emptyList()) { track ->
+        trackListAdapter = TracksAdapter(emptyList(), listener = { track ->
             viewModel.updateHistory(track)
             trackIntent(track)
-        }
+        })
 
         searchEditText = binding.searchEdit
         clearButton = binding.clearButton
@@ -144,7 +144,8 @@ class SearchFragment : Fragment() {
                 is SearchState.History -> {
                     historyAdapter.tracks = screenState.tracks
                     historyAdapter.notifyDataSetChanged()
-                    val historyVisibility = if (screenState.tracks.isNotEmpty()) View.VISIBLE else View.GONE
+                    val historyVisibility =
+                        if (screenState.tracks.isNotEmpty()) View.VISIBLE else View.GONE
                     renderScreenState(
                         tracksVisibility = View.GONE,
                         historyVisibility = historyVisibility,
