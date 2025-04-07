@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".media.ui.playlists.CreatePlaylistFragment">
+    tools:context=".media.ui.playlists.create_playlist.CreatePlaylistFragment">
 
 
     <ImageButton
@@ -37,19 +37,18 @@
         app:layout_constraintStart_toEndOf="@id/back_button"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cover"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/album_cover_shape"
-        android:clipToOutline="true"
         android:scaleType="centerInside"
         android:src="@drawable/add_photo"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_tab" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -66,7 +65,6 @@
         app:hintEnabled="true"
         app:hintTextColor="@color/blue_loading"
         android:textColorHint="@color/settings_text_black"
-        app:expandedHintEnabled="true"
         app:boxStrokeColor="@color/color_selector"
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="1dp">
@@ -113,7 +111,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/save_button"
         android:layout_width="0dp"
         android:layout_height="44dp"

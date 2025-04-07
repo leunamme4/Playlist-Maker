@@ -68,7 +68,12 @@ class PlaylistsFragment : Fragment() {
     }
 
     private fun showContent(playlists: List<Playlist>) {
-        binding.recyclerView.adapter = PlaylistsAdapter(playlists)
+        binding.recyclerView.adapter = PlaylistsAdapter(playlists) { playlist ->
+            val bundle = Bundle().apply {
+                putInt("id", playlist.id)
+            }
+            findNavController().navigate(R.id.action_mediaFragment_to_playlistFragment, bundle)
+        }
         binding.recyclerView.visibility = View.VISIBLE
         binding.noContent.visibility = View.GONE
     }
