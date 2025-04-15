@@ -1,10 +1,13 @@
 package com.example.playlistmaker.media.data
 
+import android.util.Log
 import com.example.playlistmaker.db.AppDatabase
 import com.example.playlistmaker.db.entity.PlaylistEntity
 import com.example.playlistmaker.media.domain.api.PlaylistsRepository
 import com.example.playlistmaker.media.domain.models.Playlist
 import com.example.playlistmaker.search.domain.models.Track
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +28,8 @@ class PlaylistsRepositoryImpl(
             tracksCount = playlist.tracksCount
         )
         database.playlistsDao().addPlaylist(playlistEntity)
+
+        savePlaylistToFirebase(playlistEntity)
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {
@@ -44,6 +49,7 @@ class PlaylistsRepositoryImpl(
     }
 
     override suspend fun addTrack(track: Track, playlist: Playlist) {
+        deletePlaylistFromFirebase(converter.map(playlist))
         playlist.tracksCount++
 
         val listOfIds = mutableListOf<Int>()
@@ -60,6 +66,7 @@ class PlaylistsRepositoryImpl(
         database.tracksPlaylistDao().addToPlaylist(trackConverter.mapInPlaylist(track))
 
         database.playlistsDao().addPlaylist(converter.map(playlist))
+        savePlaylistToFirebase(converter.map(playlist))
     }
 
     override suspend fun getPlaylistById(id: Int): Playlist {
@@ -86,6 +93,7 @@ class PlaylistsRepositoryImpl(
     }
 
     override suspend fun deleteTrackById(trackId: Int, playlist: Playlist) {
+        deletePlaylistFromFirebase(converter.map(playlist))
         val playlists = database.playlistsDao().getPlaylists()
 
         playlists.forEach {
@@ -114,6 +122,7 @@ class PlaylistsRepositoryImpl(
         database.playlistsDao().addPlaylist(converter.map(playlist))
 
         database.tracksPlaylistDao().deleteTrackById(trackId)
+        savePlaylistToFirebase(converter.map(playlist))
     }
 
     override suspend fun deletePlaylist(playlist: Playlist) {
@@ -125,6 +134,57 @@ class PlaylistsRepositoryImpl(
         }
 
         database.playlistsDao().deletePlaylist(playlist.id)
+        deletePlaylistFromFirebase(converter.map(playlist))
+    }
+
+
+    private fun savePlaylistToFirebase(playlist: PlaylistEntity) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+        val playlistMap = mapOf(
+            "id" to playlist.id,
+            "name" to playlist.name,
+            "description" to playlist.description,
+            "coverPath" to playlist.coverPath,
+            "trackListIds" to playlist.trackListIds,
+            "tracksCount" to playlist.tracksCount
+        )
+
+        try {
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid!!)
+                .collection("playlists")
+                .document(playlist.id.toString()) // ID как строка в Firestore
+                .set(playlistMap)
+                .addOnSuccessListener {
+                    Log.d("Firebase_SAVE", "Playlist saved: ${playlist.name}")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firebase_SAVE", "Failed to save playlist", e)
+                }
+        } catch (e: Exception) {
+            Log.e("Firebase_SAVE", "Exception: ${e.message}")
+        }
+    }
+
+    private fun deletePlaylistFromFirebase(playlist: PlaylistEntity) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (uid != null) {
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .collection("playlists")
+                .document(playlist.id.toString())
+                .delete()
+                .addOnSuccessListener {
+                    Log.d("Firebase_DELETE", "Playlist deleted: ${playlist.name}")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firebase_DELETE", "Failed to delete playlist", e)
+                }
+        }
     }
 
 

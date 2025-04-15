@@ -99,6 +99,21 @@
                     android:src="@drawable/agreement_button"
                     app:tint="@color/settings_icon" />
             </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/profile"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/settings_layouts_height">
+
+                <TextView
+                    style="@style/SettingsText"
+                    android:text="Профиль" />
+
+                <ImageView
+                    style="@style/SettingsMenuIcon"
+                    android:src="@drawable/agreement_button"
+                    app:tint="@color/settings_icon" />
+            </FrameLayout>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

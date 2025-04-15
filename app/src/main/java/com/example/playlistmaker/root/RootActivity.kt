@@ -7,6 +7,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityRootBinding
+import com.example.playlistmaker.db.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.getKoin
 
 class RootActivity : AppCompatActivity() {
 
@@ -27,6 +32,16 @@ class RootActivity : AppCompatActivity() {
         val bottomNavigationView = binding.bottomNavigationView
         bottomNavigationView.setupWithNavController(navController)
 
+    }
+
+    override fun onDestroy() {
+        if (isFinishing) GlobalScope.launch (Dispatchers.Main) {
+            val db: AppDatabase = getKoin().get()
+            db.playlistsDao().clearPlaylists()
+            db.TracksDao().clearFavorites()
+            db.tracksPlaylistDao().clearPlaylistsTracks()
+        }
+        super.onDestroy()
     }
 
     fun hideNavigationBar() {

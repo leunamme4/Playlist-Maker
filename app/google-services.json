@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "786803603296",
+    "firebase_url": "https://playlistmaker-ad5e2-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "playlistmaker-ad5e2",
+    "storage_bucket": "playlistmaker-ad5e2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786803603296:android:feed1953eebbbc4b4ad005",
+        "android_client_info": {
+          "package_name": "com.example.playlistmaker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGZ2v9pRpNtngri1VGBvzRjxVlbk3KNL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -20,4 +20,7 @@ interface TracksDao {
 
     @Query("SELECT trackId FROM tracks_favorite")
     suspend fun getFavoritesId(): List<Int>
+
+    @Query("DELETE FROM tracks_favorite")
+    suspend fun clearFavorites()
 }

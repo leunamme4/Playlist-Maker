@@ -20,4 +20,7 @@ interface PlaylistsDao {
 
     @Query("SELECT * FROM playlists")
     suspend fun getPlaylists(): List<PlaylistEntity>
+
+    @Query("DELETE FROM playlists")
+    suspend fun clearPlaylists()
 }
